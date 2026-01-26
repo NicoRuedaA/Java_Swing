@@ -35,7 +35,7 @@ public class ServerAdminPanel extends JFrame {
         // cream 4 subrids
         JPanel subGridTopLeft = new JPanel(new GridLayout(2, 1));
         JPanel subGridTopRight = new JPanel(new GridLayout(3, 1, 0, 10));
-        JPanel subGridBotLeft = new JPanel(new GridLayout(4, 1, 1000, 0));
+        JPanel subGridBotLeft = new JPanel(new GridLayout(4, 1, 0, 0));
         JPanel subGridBotRight = new JPanel(new GridLayout(1, 1));
 
         // ***SUBGRID TOP LEFT***/
@@ -59,6 +59,7 @@ public class ServerAdminPanel extends JFrame {
 
         // feim visible el Jframe
         this.setVisible(true);
+        this.setResizable(false);
         // importam un tema
         // si limportam l'efecte del slider no funcionara
         // this.setTheme("javax.swing.plaf.nimbus.NimbusLookAndFeel");
@@ -103,9 +104,9 @@ public class ServerAdminPanel extends JFrame {
         // cream un Sliders
         JSlider sliderBotLeft1 = new JSlider(0, 500, 250);
         // numeros cada 50
-        sliderBotLeft1.setMajorTickSpacing(50);
+        sliderBotLeft1.setMajorTickSpacing(100);
         // retxa cada 10
-        sliderBotLeft1.setMinorTickSpacing(10);
+        sliderBotLeft1.setMinorTickSpacing(25);
         // dibuixam ses retxes
         sliderBotLeft1.setPaintTicks(true);
         // dibuixam els numeros
@@ -123,6 +124,7 @@ public class ServerAdminPanel extends JFrame {
         JTextField textBotLeft3 = new JTextField(30);
         // establim text
         textBotLeft3.setText("60");
+        textBotLeft3.setEditable(false);
         // afegim text
         subGrid.add(textBotLeft3);
 
@@ -150,11 +152,8 @@ public class ServerAdminPanel extends JFrame {
         TitledBorder titulo = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black, 1),
                 "Accions Ràpides",
                 TitledBorder.LEFT, TitledBorder.TOP);
-        // aplicam el border
-        g.setBorder(titulo);
-        // creamos 4 botones
 
-        // cream 3 botons
+        // creamos 3 botones
         JButton bottoTopRight1 = new JButton("▶ Iniciar Servei");
         JButton bottoTopRight2 = new JButton("■ Aturar Servei");
         JButton bottoTopRight3 = new JButton("↻ Reiniciar");
