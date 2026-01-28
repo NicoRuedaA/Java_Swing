@@ -14,8 +14,8 @@ public class CalculadoraVisual extends JFrame {
     private static final int ROWS = 6;
     private static final int COLS = 1;
 
-    int operant1 = 0;
-    int operant2 = 0;
+    double operant1 = 0;
+    double operant2 = 0;
 
     public CalculadoraVisual() {
 
@@ -221,19 +221,51 @@ public class CalculadoraVisual extends JFrame {
 
         if (valor.equals("")) {
             textAreaHistorial.setText(" ");
+            textAreaResultat.setText(String.valueOf(operant1));
         }
 
-        else if ((valor.equals("*")) || (valor.equals("*"))) {
-            textAreaHistorial.setText(" ");
+        else if (valor.equals("+")) {
+            operant2 += operant1;
+            textAreaHistorial.setText(textAreaHistorial.getText() + " + ");
+
+            textAreaResultat.setText(String.valueOf(operant2));
+            operant1 = 0;
+        } else if (valor.equals("-")) {
+            textAreaResultat.setText(String.valueOf(operant2));
+            operant2 -= operant1;
+            textAreaHistorial.setText(textAreaHistorial.getText() + " - ");
+
+            textAreaResultat.setText(String.valueOf(operant2));
+            operant1 = 0;
+        } else if (valor.equals("*")) {
+            operant2 *= operant1;
+            textAreaHistorial.setText(textAreaHistorial.getText() + " * ");
+
+            textAreaResultat.setText(String.valueOf(operant2));
+            operant1 = 0;
+        } else if (valor.equals("/")) {
+            operant2 /= operant1;
+            textAreaHistorial.setText(textAreaHistorial.getText() + " / ");
+
+            textAreaResultat.setText(String.valueOf(operant2));
+            operant1 = 0;
+        }
+
+        else if ((valor.equals("="))) {
+            operant1 = operant1 + operant2;
+            textAreaHistorial.setText(textAreaHistorial.getText() + " " + valor + " ");
+            textAreaResultat.setText(String.valueOf(operant1));
+            operant2 = 0;
         }
 
         else {
 
             textAreaHistorial.setText(textAreaHistorial.getText() + " " + valor + " ");
+            operant1 *= 10;
+            operant1 += Integer.parseInt(valor);
+            textAreaResultat.setText(String.valueOf(operant1));
         }
 
-        operant1 = Integer.parseInt(valor);
-        textAreaResultat.setText(String.valueOf(operant1));
     }
 
 }
