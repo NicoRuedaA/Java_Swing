@@ -16,6 +16,9 @@ public class CalculadoraVisual extends JFrame {
 
     double operant1 = 0;
     double operant2 = 0;
+    double resultat = 0;
+
+    char operacio = ' ';
 
     public CalculadoraVisual() {
 
@@ -161,7 +164,7 @@ public class CalculadoraVisual extends JFrame {
 
         botoDividir.addActionListener(e -> registrarAccion("/"));
 
-        botoClear.addActionListener(e -> registrarAccion(""));
+        botoClear.addActionListener(e -> registrarAccion(" "));
 
         g.add(boto7);
         g.add(boto8);
@@ -218,52 +221,78 @@ public class CalculadoraVisual extends JFrame {
     }
 
     public void registrarAccion(String valor) {
+        switch (valor) {
+            case "+":
+                if (operant1 == 0) {
+                    textAreaHistorial.setText(resultat + " + ");
+                } else {
+                    resultat += operant1;
+                    textAreaHistorial.setText(textAreaHistorial.getText() + " + ");
 
-        if (valor.equals("")) {
-            textAreaHistorial.setText(" ");
-            textAreaResultat.setText(String.valueOf(operant1));
-        }
+                }
+                operant1 = 0;
+                operacio = '+';
+                break;
+            case "-":
+                operacio = '-';
+                break;
+            case "*":
+                operacio = '*';
+                break;
+            case "/":
+                operacio = '/';
+                break;
+            case "=":
+                resultat += operant1;
+                textAreaHistorial.setText(textAreaHistorial.getText() + " = ");
+                // + textAreaHistorial.getText() + operant1 + " = " + resultat + " "
+                textAreaResultat.setText(String.valueOf(resultat));
+                operant1 = 0;
+                break;
+            case " ":
+                System.out.println("deberia entrar aqui");
+                operacio = ' ';
+                operant1 = 0;
+                resultat = 0;
+                textAreaResultat.setText("0");
+                textAreaHistorial.setText("0");
+                break;
+            default:
+                operant1 *= 10;
+                operant1 += Integer.parseInt(valor);
+                // textAreaHistorial.setText(valor);
+                if (resultat != 0) {
+                    if (operant1 == 0) {
+                        textAreaHistorial
+                                .setText(String.valueOf(textAreaHistorial.getText() + " " + String.valueOf(operant1)));
+                    } else {
+                        double copiaOperant1 = operant1;
+                        int numDigitos = 1;
+                        boolean buscar = true;
+                        while (buscar) {
+                            if (copiaOperant1 % 10 > 0) {
+                                numDigitos++;
+                            } else
+                                buscar = false;
+                        }
+                        String borrado = textAreaHistorial.getText();
+                        borrado.substring(0, borrado.length() - 2);
+                        textAreaHistorial
+                                .setText(borrado + " " + String.valueOf(operant1));
 
-        else if (valor.equals("+")) {
-            operant2 += operant1;
-            textAreaHistorial.setText(textAreaHistorial.getText() + " + ");
+                        // borrar el numero anterior. No solo el numero anterior sino el conjunto (puede
+                        // ser 11 asi que los dos 1, no el 1 primero)
+                    }
+                    // textAreaHistorial.setText(String.valueOf(textAreaHistorial.getText() +
+                    // operant1));
+                    // textAreaHistorial.setText(String.valueOf(textAreaHistorial.getText() +
+                    // String.valueOf(operant1)));
 
-            textAreaResultat.setText(String.valueOf(operant2));
-            operant1 = 0;
-        } else if (valor.equals("-")) {
-            textAreaResultat.setText(String.valueOf(operant2));
-            operant2 -= operant1;
-            textAreaHistorial.setText(textAreaHistorial.getText() + " - ");
+                } else
+                    textAreaHistorial.setText(String.valueOf(operant1));
 
-            textAreaResultat.setText(String.valueOf(operant2));
-            operant1 = 0;
-        } else if (valor.equals("*")) {
-            operant2 *= operant1;
-            textAreaHistorial.setText(textAreaHistorial.getText() + " * ");
-
-            textAreaResultat.setText(String.valueOf(operant2));
-            operant1 = 0;
-        } else if (valor.equals("/")) {
-            operant2 /= operant1;
-            textAreaHistorial.setText(textAreaHistorial.getText() + " / ");
-
-            textAreaResultat.setText(String.valueOf(operant2));
-            operant1 = 0;
-        }
-
-        else if ((valor.equals("="))) {
-            operant1 = operant1 + operant2;
-            textAreaHistorial.setText(textAreaHistorial.getText() + " " + valor + " ");
-            textAreaResultat.setText(String.valueOf(operant1));
-            operant2 = 0;
-        }
-
-        else {
-
-            textAreaHistorial.setText(textAreaHistorial.getText() + " " + valor + " ");
-            operant1 *= 10;
-            operant1 += Integer.parseInt(valor);
-            textAreaResultat.setText(String.valueOf(operant1));
+                textAreaResultat.setText(String.valueOf(operant1));
+                break;
         }
 
     }
