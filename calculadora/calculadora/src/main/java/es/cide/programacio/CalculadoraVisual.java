@@ -4,8 +4,16 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.text.DecimalFormat;
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.FlatIntelliJLaf;
+import javax.swing.UIManager;
+import javax.swing.SwingUtilities;
 
 public class CalculadoraVisual extends JFrame {
+
+    DecimalFormat df = new DecimalFormat("####.##");
 
     JTextArea textAreaResultat;
     JTextArea textAreaHistorial;
@@ -45,10 +53,10 @@ public class CalculadoraVisual extends JFrame {
         // cream 4 subrids
         JPanel fila1 = new JPanel(new GridLayout(1, 1));
         JPanel fila2 = new JPanel(new GridLayout(1, 1));
-        JPanel fila3 = new JPanel(new GridLayout(1, 5));
-        JPanel fila4 = new JPanel(new GridLayout(1, 5));
-        JPanel fila5 = new JPanel(new GridLayout(1, 5));
-        JPanel fila6 = new JPanel(new GridLayout(1, 5));
+        JPanel fila3 = new JPanel(new GridLayout(1, 4));
+        JPanel fila4 = new JPanel(new GridLayout(1, 4));
+        JPanel fila5 = new JPanel(new GridLayout(1, 4));
+        JPanel fila6 = new JPanel(new GridLayout(1, 4));
 
         configureFila1(fila1);
         configureFila2(fila2, textAreaResultat);
@@ -77,27 +85,23 @@ public class CalculadoraVisual extends JFrame {
     }
 
     private void configureFila6(JPanel g) {
-        JButton botoPunt = new JButton(".");
-        JButton boto0 = new JButton("0");
-        JButton botoComa = new JButton(",");
-        JButton botoPerCent = new JButton("%");
-        JButton botoDolar = new JButton("$");
 
-        botoPunt.addActionListener(e -> registrarAccion("."));
+        JButton botoClear = new JButton("Clear");
+        JButton boto0 = new JButton("0");
+        JButton botoIgual = new JButton("=");
+        JButton botoSumar = new JButton("+");
+        botoClear.addActionListener(e -> registrarAccion(" "));
+        botoSumar.addActionListener(e -> registrarAccion("+"));
+
+        botoIgual.addActionListener(e -> registrarAccion("="));
 
         boto0.addActionListener(e -> registrarAccion("0"));
-
-        botoComa.addActionListener(e -> registrarAccion(","));
-
-        botoPerCent.addActionListener(e -> registrarAccion("%"));
-
-        botoDolar.addActionListener(e -> registrarAccion("$"));
-
-        g.add(botoPunt);
+        g.add(botoClear);
         g.add(boto0);
-        g.add(botoComa);
-        g.add(botoPerCent);
-        g.add(botoDolar);
+
+        g.add(botoIgual);
+
+        g.add(botoSumar);
 
     }
 
@@ -105,47 +109,38 @@ public class CalculadoraVisual extends JFrame {
         JButton boto1 = new JButton("1");
         JButton boto2 = new JButton("2");
         JButton boto3 = new JButton("3");
-        JButton botoIgual = new JButton("=");
-        JButton botoMes = new JButton("+");
+        JButton botoRestar = new JButton("-");
 
         boto1.addActionListener(e -> registrarAccion("1"));
 
         boto2.addActionListener(e -> registrarAccion("2"));
         boto3.addActionListener(e -> registrarAccion("3"));
-
-        botoIgual.addActionListener(e -> registrarAccion("="));
-
-        botoMes.addActionListener(e -> registrarAccion("+"));
+        botoRestar.addActionListener(e -> registrarAccion("-"));
 
         g.add(boto1);
         g.add(boto2);
         g.add(boto3);
-        g.add(botoIgual);
-        g.add(botoMes);
+        g.add(botoRestar);
+
     }
 
     private void configureFila4(JPanel g) {
         JButton boto4 = new JButton("4");
         JButton boto5 = new JButton("5");
         JButton boto6 = new JButton("6");
-        JButton botoRestar = new JButton("-");
         JButton botoMultiplicar = new JButton("*");
 
         boto4.addActionListener(e -> registrarAccion("4"));
 
         boto5.addActionListener(e -> registrarAccion("5"));
         boto6.addActionListener(e -> registrarAccion("6"));
-
-        botoRestar.addActionListener(e -> registrarAccion("-"));
-
-        botoMultiplicar
-                .addActionListener(e -> registrarAccion("*"));
+        botoMultiplicar.addActionListener(e -> registrarAccion("*"));
 
         g.add(boto4);
         g.add(boto5);
         g.add(boto6);
-        g.add(botoRestar);
         g.add(botoMultiplicar);
+
     }
 
     private void configureFila3(JPanel g) {
@@ -153,24 +148,18 @@ public class CalculadoraVisual extends JFrame {
         JButton boto8 = new JButton("8");
         JButton boto9 = new JButton("9");
         JButton botoDividir = new JButton("/");
-        JButton botoClear = new JButton("Clear");
-
-        boto7.getText();
 
         boto7.addActionListener(e -> registrarAccion("7"));
 
         boto8.addActionListener(e -> registrarAccion("8"));
         boto9.addActionListener(e -> registrarAccion("9"));
-
         botoDividir.addActionListener(e -> registrarAccion("/"));
-
-        botoClear.addActionListener(e -> registrarAccion(" "));
 
         g.add(boto7);
         g.add(boto8);
         g.add(boto9);
         g.add(botoDividir);
-        g.add(botoClear);
+
     }
 
     private void configureFila2(JPanel g, JTextArea text) {
@@ -212,89 +201,92 @@ public class CalculadoraVisual extends JFrame {
 
     private void setTheme(String s) {
         // importam el tema amb try catch per prevenir errors
-        try {
-            UIManager.setLookAndFeel(s);
-            SwingUtilities.updateComponentTreeUI(this);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        UIManager.setLookAndFeel(themeClass);
+
+        // 2. Método optimizado de FlatLaf para refrescar toda la app
+        FlatLaf.updateUI();
+
+        // 3. Opcional: Si tienes ventanas abiertas, esto asegura que se repinten
+        SwingUtilities.updateComponentTreeUI(this);
     }
 
     public void registrarAccion(String valor) {
-        switch (valor) {
-            case "+":
-                if (operant1 == 0) {
-                    textAreaHistorial.setText(resultat + " + ");
-                } else {
-                    resultat += operant1;
-                    textAreaHistorial.setText(textAreaHistorial.getText() + " + ");
 
-                }
-                operant1 = 0;
-                operacio = '+';
-                break;
-            case "-":
-                operacio = '-';
-                break;
-            case "*":
-                operacio = '*';
-                break;
-            case "/":
-                operacio = '/';
-                break;
-            case "=":
+        // operaciones aritmeticas
+        if (valor.equals("+") || valor.equals("-") || valor.equals("*") || valor.equals("/")) {
+            if (operant1 == 0) {
+                textAreaHistorial.setText(resultat + " " + valor + " ");
+            } else {
                 resultat += operant1;
-                textAreaHistorial.setText(textAreaHistorial.getText() + " = ");
-                // + textAreaHistorial.getText() + operant1 + " = " + resultat + " "
+                textAreaHistorial.setText(textAreaHistorial.getText() + " " + valor + " ");
                 textAreaResultat.setText(String.valueOf(resultat));
-                operant1 = 0;
-                break;
-            case " ":
-                System.out.println("deberia entrar aqui");
-                operacio = ' ';
-                operant1 = 0;
-                resultat = 0;
-                textAreaResultat.setText("0");
-                textAreaHistorial.setText("0");
-                break;
-            default:
-                operant1 *= 10;
-                operant1 += Integer.parseInt(valor);
-                // textAreaHistorial.setText(valor);
-                if (resultat != 0) {
-                    if (operant1 == 0) {
-                        textAreaHistorial
-                                .setText(String.valueOf(textAreaHistorial.getText() + " " + String.valueOf(operant1)));
+
+            }
+            operant1 = 0;
+
+            operacio = valor.charAt(0);
+        }
+        // el resto
+        else {
+            switch (valor) {
+                case ".":
+                    break;
+
+                case "=":
+                    resultat = operar(resultat, operant1, operacio);
+                    textAreaHistorial.setText(textAreaHistorial.getText() + " = ");
+                    // + textAreaHistorial.getText() + operant1 + " = " + resultat + " "
+                    textAreaResultat.setText(String.valueOf(resultat));
+                    operant1 = 0;
+                    break;
+                case " ":
+                    operacio = ' ';
+                    operant1 = 0;
+                    resultat = 0;
+                    textAreaResultat.setText("0");
+                    textAreaHistorial.setText("0");
+                    break;
+                default:
+                    // numeros
+                    if (resultat != 0) {
+                        operant1 *= 10;
+                        operant1 += Integer.parseInt(valor);
+                        textAreaHistorial.setText(
+                                String.valueOf(textAreaHistorial.getText() + df.format(Integer.parseInt(valor))));
+
                     } else {
-                        double copiaOperant1 = operant1;
-                        int numDigitos = 1;
-                        boolean buscar = true;
-                        while (buscar) {
-                            if (copiaOperant1 % 10 > 0) {
-                                numDigitos++;
-                            } else
-                                buscar = false;
-                        }
-                        String borrado = textAreaHistorial.getText();
-                        borrado.substring(0, borrado.length() - 2);
-                        textAreaHistorial
-                                .setText(borrado + " " + String.valueOf(operant1));
-
-                        // borrar el numero anterior. No solo el numero anterior sino el conjunto (puede
-                        // ser 11 asi que los dos 1, no el 1 primero)
+                        operant1 *= 10;
+                        operant1 += Integer.parseInt(valor);
+                        textAreaHistorial.setText(String.valueOf(df.format(operant1)));
                     }
-                    // textAreaHistorial.setText(String.valueOf(textAreaHistorial.getText() +
-                    // operant1));
-                    // textAreaHistorial.setText(String.valueOf(textAreaHistorial.getText() +
-                    // String.valueOf(operant1)));
 
-                } else
-                    textAreaHistorial.setText(String.valueOf(operant1));
-
-                textAreaResultat.setText(String.valueOf(operant1));
-                break;
+                    textAreaResultat.setText(String.valueOf(df.format(operant1)));
+                    break;
+            }
         }
 
+    }
+
+    private double operar(double a, double b, char operacio) {
+        double resultat = 0;
+        switch (operacio) {
+
+            case '-':
+                resultat = a - b;
+                break;
+            case '*':
+                resultat = a * b;
+                break;
+            case '/':
+                resultat = a / b;
+                break;
+
+            default:
+                resultat = a + b;
+                break;
+
+        }
+        return resultat;
     }
 
 }
