@@ -8,10 +8,38 @@ import java.text.DecimalFormat;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
-import javax.swing.UIManager;
-import javax.swing.SwingUtilities;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 
 public class CalculadoraVisual extends JFrame {
+
+    FlatSVGIcon icono1 = new FlatSVGIcon("icons/1.svg");
+    FlatSVGIcon icono2 = new FlatSVGIcon("icons/2.svg");
+    FlatSVGIcon icono3 = new FlatSVGIcon("icons/3.svg");
+    FlatSVGIcon icono4 = new FlatSVGIcon("icons/4.svg");
+    FlatSVGIcon icono5 = new FlatSVGIcon("icons/5.svg");
+    FlatSVGIcon icono6 = new FlatSVGIcon("icons/6.svg");
+    FlatSVGIcon icono7 = new FlatSVGIcon("icons/7.svg");
+    FlatSVGIcon icono8 = new FlatSVGIcon("icons/8.svg");
+    FlatSVGIcon icono9 = new FlatSVGIcon("icons/9.svg");
+
+    JButton boto1 = new JButton("1", icono1);
+    JButton boto2 = new JButton("2", icono2);
+    JButton boto3 = new JButton("3", icono3);
+    JButton boto4 = new JButton("4", icono4);
+    JButton boto5 = new JButton("5", icono5);
+    JButton boto6 = new JButton("6", icono6);
+    JButton boto7 = new JButton("7", icono7);
+    JButton boto8 = new JButton("8", icono8);
+    JButton boto9 = new JButton("9", icono9);
+    JButton boto0 = new JButton("0");
+    JButton botoClear = new JButton("Clear");
+    JButton botoIgual = new JButton("=");
+    JButton botoSumar = new JButton("+");
+    JButton botoRestar = new JButton("-");
+    JButton botoMultiplicar = new JButton("*");
+    JButton botoDividir = new JButton("/");
 
     DecimalFormat df = new DecimalFormat("####.##");
 
@@ -32,9 +60,12 @@ public class CalculadoraVisual extends JFrame {
 
         textAreaResultat = new JTextArea();
         textAreaHistorial = new JTextArea();
+
+        textAreaHistorial.setBackground(new Color(100, 100, 100));
+        textAreaResultat.setBackground(new Color(100, 100, 100));
         // ***VENTANA***/
         // titol
-        this.setTitle("Tauler d'administració - Nico Rueda");
+        this.setTitle("Calculadora - Nico Rueda");
         // tamany
         this.setSize(WIDTH, HEIGHT);
         // comportament
@@ -80,16 +111,93 @@ public class CalculadoraVisual extends JFrame {
 
         // feim visible el Jframe
         this.setVisible(true);
-        this.setResizable(false);
+        // this.setResizable(false);
+
+        try {
+            // Cargamos la imagen desde la carpeta de recursos
+            ImageIcon icono = new ImageIcon(getClass().getResource("/icono.png"));
+            this.setIconImage(icono.getImage());
+        } catch (Exception e) {
+            System.out.println("No se pudo cargar el icono: " + e.getMessage());
+        }
+
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent e) {
+                // si pulsamos una tecla
+                if (e.getID() == KeyEvent.KEY_PRESSED) {
+                    // guardamos la tecla pulsada en un char
+                    char c = e.getKeyChar();
+                    // guardamos el codigo de la tecla pulsada en un int
+                    int codigo = e.getKeyCode();
+                    // si la tecla es un digito
+                    if (Character.isDigit(c)) {
+                        // registrarAccion(String.valueOf(c));
+                        switch (c) {
+                            case '1':
+                                boto1.doClick();
+                                break;
+                            case '2':
+                                boto2.doClick();
+                                break;
+                            case '3':
+                                boto3.doClick();
+                                break;
+                            case '4':
+                                boto4.doClick();
+                                break;
+                            case '5':
+                                boto5.doClick();
+                                break;
+                            case '6':
+                                boto6.doClick();
+                                break;
+                            case '7':
+                                boto7.doClick();
+                                break;
+                            case '8':
+                                boto8.doClick();
+                                break;
+                            case '9':
+                                boto9.doClick();
+                                break;
+                            case '0':
+                                boto0.doClick();
+                                break;
+                        }
+                    } else {
+                        // si la tecla es enter
+                        if (codigo == KeyEvent.VK_ENTER) {
+                            // registrarAccion("=");
+                            botoIgual.doClick();
+                            // si la tecla es el boton de borrar
+                        } else if (codigo == KeyEvent.VK_BACK_SPACE) {
+                            // registrarAccion(" ");
+                            botoClear.doClick();
+                            // si es un boton de +, -, *, /
+                        } else if (c == '+' || c == '-' || c == '*' || c == '/') {
+                            // registrarAccion(String.valueOf(c));
+                            if (c == '+') {
+                                botoSumar.doClick();
+                            } else if (c == '-') {
+                                botoRestar.doClick();
+                            } else if (c == '*') {
+                                botoMultiplicar.doClick();
+                            } else if (c == '/') {
+                                botoDividir.doClick();
+
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+        });
 
     }
 
     private void configureFila6(JPanel g) {
 
-        JButton botoClear = new JButton("Clear");
-        JButton boto0 = new JButton("0");
-        JButton botoIgual = new JButton("=");
-        JButton botoSumar = new JButton("+");
         botoClear.addActionListener(e -> registrarAccion(" "));
         botoSumar.addActionListener(e -> registrarAccion("+"));
 
@@ -106,10 +214,11 @@ public class CalculadoraVisual extends JFrame {
     }
 
     private void configureFila5(JPanel g) {
-        JButton boto1 = new JButton("1");
-        JButton boto2 = new JButton("2");
-        JButton boto3 = new JButton("3");
-        JButton botoRestar = new JButton("-");
+        boto1.setFont(new Font("Arial", Font.PLAIN, 0));
+
+        boto2.setFont(new Font("Arial", Font.PLAIN, 0));
+
+        boto3.setFont(new Font("Arial", Font.PLAIN, 0));
 
         boto1.addActionListener(e -> registrarAccion("1"));
 
@@ -125,10 +234,12 @@ public class CalculadoraVisual extends JFrame {
     }
 
     private void configureFila4(JPanel g) {
-        JButton boto4 = new JButton("4");
-        JButton boto5 = new JButton("5");
-        JButton boto6 = new JButton("6");
-        JButton botoMultiplicar = new JButton("*");
+
+        boto4.setFont(new Font("Arial", Font.PLAIN, 0));
+
+        boto5.setFont(new Font("Arial", Font.PLAIN, 0));
+
+        boto6.setFont(new Font("Arial", Font.PLAIN, 0));
 
         boto4.addActionListener(e -> registrarAccion("4"));
 
@@ -144,10 +255,12 @@ public class CalculadoraVisual extends JFrame {
     }
 
     private void configureFila3(JPanel g) {
-        JButton boto7 = new JButton("7");
-        JButton boto8 = new JButton("8");
-        JButton boto9 = new JButton("9");
-        JButton botoDividir = new JButton("/");
+
+        boto7.setFont(new Font("Arial", Font.PLAIN, 0));
+
+        boto8.setFont(new Font("Arial", Font.PLAIN, 0));
+
+        boto9.setFont(new Font("Arial", Font.PLAIN, 0));
 
         boto7.addActionListener(e -> registrarAccion("7"));
 
@@ -201,13 +314,15 @@ public class CalculadoraVisual extends JFrame {
 
     private void setTheme(String s) {
         // importam el tema amb try catch per prevenir errors
-        UIManager.setLookAndFeel(themeClass);
-
-        // 2. Método optimizado de FlatLaf para refrescar toda la app
-        FlatLaf.updateUI();
-
-        // 3. Opcional: Si tienes ventanas abiertas, esto asegura que se repinten
-        SwingUtilities.updateComponentTreeUI(this);
+        /*
+         * UIManager.setLookAndFeel(themeClass);
+         * 
+         * // 2. Método optimizado de FlatLaf para refrescar toda la app
+         * FlatLaf.updateUI();
+         * 
+         * // 3. Opcional: Si tienes ventanas abiertas, esto asegura que se repinten
+         * SwingUtilities.updateComponentTreeUI(this);
+         */
     }
 
     public void registrarAccion(String valor) {
@@ -233,11 +348,19 @@ public class CalculadoraVisual extends JFrame {
                     break;
 
                 case "=":
-                    resultat = operar(resultat, operant1, operacio);
-                    textAreaHistorial.setText(textAreaHistorial.getText() + " = ");
-                    // + textAreaHistorial.getText() + operant1 + " = " + resultat + " "
-                    textAreaResultat.setText(String.valueOf(resultat));
+                    if ((operacio == '/') && (operant1 == 0)) {
+                        textAreaHistorial.setText("No se puede dividir por 0");
+                        textAreaResultat.setText("No se puede dividir por 0");
+                        resultat = 0;
+                    } else {
+                        resultat = operar(resultat, operant1, operacio);
+                        textAreaHistorial.setText(textAreaHistorial.getText() + " = ");
+
+                        textAreaResultat.setText(String.valueOf(resultat));
+
+                    }
                     operant1 = 0;
+
                     break;
                 case " ":
                     operacio = ' ';
