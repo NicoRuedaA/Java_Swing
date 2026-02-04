@@ -2,9 +2,10 @@ package es.cide.programacio;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
+
 import java.awt.*;
 import java.text.DecimalFormat;
+import javax.swing.border.TitledBorder;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
@@ -12,7 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 
-public class CalculadoraVisual extends JFrame {
+public class CalculadoraVisual extends CalculadoraLogica {
 
     FlatSVGIcon icono1 = new FlatSVGIcon("icons/1.svg");
     FlatSVGIcon icono2 = new FlatSVGIcon("icons/2.svg");
@@ -74,7 +75,7 @@ public class CalculadoraVisual extends JFrame {
         this.setLocationRelativeTo(null);
 
         // ***GRID***/
-        // cream un grid.
+        // cream un grid. //6 //1
         JPanel grid = new JPanel(new GridLayout(ROWS, COLS, 15, 15));
         // ceamos empty border
         EmptyBorder emptyBorder = new EmptyBorder(10, 10, 10, 10);
@@ -303,113 +304,94 @@ public class CalculadoraVisual extends JFrame {
         g.add(textAreaHistorial);
     }
 
-    private void setTitledBorder(String s, JPanel panel) {
-        // cream un titol amb borde de tipus linea de color negre amb amplada 1
-        TitledBorder titulo = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black, 1), s,
-                TitledBorder.LEFT, TitledBorder.TOP);
-        // aplicam el borde
-        panel.setBorder(titulo);
-
-    }
-
-    private void setTheme(String s) {
-        // importam el tema amb try catch per prevenir errors
-        /*
-         * UIManager.setLookAndFeel(themeClass);
-         * 
-         * // 2. Método optimizado de FlatLaf para refrescar toda la app
-         * FlatLaf.updateUI();
-         * 
-         * // 3. Opcional: Si tienes ventanas abiertas, esto asegura que se repinten
-         * SwingUtilities.updateComponentTreeUI(this);
-         */
-    }
-
-    public void registrarAccion(String valor) {
-
-        // operaciones aritmeticas
-        if (valor.equals("+") || valor.equals("-") || valor.equals("*") || valor.equals("/")) {
-            if (operant1 == 0) {
-                textAreaHistorial.setText(resultat + " " + valor + " ");
-            } else {
-                resultat += operant1;
-                textAreaHistorial.setText(textAreaHistorial.getText() + " " + valor + " ");
-                textAreaResultat.setText(String.valueOf(resultat));
-
-            }
-            operant1 = 0;
-
-            operacio = valor.charAt(0);
-        }
-        // el resto
-        else {
-            switch (valor) {
-                case ".":
-                    break;
-
-                case "=":
-                    if ((operacio == '/') && (operant1 == 0)) {
-                        textAreaHistorial.setText("No se puede dividir por 0");
-                        textAreaResultat.setText("No se puede dividir por 0");
-                        resultat = 0;
-                    } else {
-                        resultat = operar(resultat, operant1, operacio);
-                        textAreaHistorial.setText(textAreaHistorial.getText() + " = ");
-
-                        textAreaResultat.setText(String.valueOf(resultat));
-
-                    }
-                    operant1 = 0;
-
-                    break;
-                case " ":
-                    operacio = ' ';
-                    operant1 = 0;
-                    resultat = 0;
-                    textAreaResultat.setText("0");
-                    textAreaHistorial.setText("0");
-                    break;
-                default:
-                    // numeros
-                    if (resultat != 0) {
-                        operant1 *= 10;
-                        operant1 += Integer.parseInt(valor);
-                        textAreaHistorial.setText(
-                                String.valueOf(textAreaHistorial.getText() + df.format(Integer.parseInt(valor))));
-
-                    } else {
-                        operant1 *= 10;
-                        operant1 += Integer.parseInt(valor);
-                        textAreaHistorial.setText(String.valueOf(df.format(operant1)));
-                    }
-
-                    textAreaResultat.setText(String.valueOf(df.format(operant1)));
-                    break;
-            }
-        }
-
-    }
-
-    private double operar(double a, double b, char operacio) {
-        double resultat = 0;
-        switch (operacio) {
-
-            case '-':
-                resultat = a - b;
-                break;
-            case '*':
-                resultat = a * b;
-                break;
-            case '/':
-                resultat = a / b;
-                break;
-
-            default:
-                resultat = a + b;
-                break;
-
-        }
-        return resultat;
-    }
-
+    /*
+     * public void registrarAccion(String valor) {
+     * 
+     * // operaciones aritmeticas
+     * if (valor.equals("+") || valor.equals("-") || valor.equals("*") ||
+     * valor.equals("/")) {
+     * if (operant1 == 0) {
+     * textAreaHistorial.setText(resultat + " " + valor + " ");
+     * } else {
+     * resultat += operant1;
+     * textAreaHistorial.setText(textAreaHistorial.getText() + " " + valor + " ");
+     * textAreaResultat.setText(String.valueOf(resultat));
+     * 
+     * }
+     * operant1 = 0;
+     * 
+     * operacio = valor.charAt(0);
+     * }
+     * // el resto
+     * else {
+     * switch (valor) {
+     * case ".":
+     * break;
+     * 
+     * case "=":
+     * if ((operacio == '/') && (operant1 == 0)) {
+     * textAreaHistorial.setText("No se puede dividir por 0");
+     * textAreaResultat.setText("No se puede dividir por 0");
+     * resultat = 0;
+     * } else {
+     * resultat = operar(resultat, operant1, operacio);
+     * textAreaHistorial.setText(textAreaHistorial.getText() + " = ");
+     * 
+     * textAreaResultat.setText(String.valueOf(resultat));
+     * 
+     * }
+     * operant1 = 0;
+     * 
+     * break;
+     * case " ":
+     * operacio = ' ';
+     * operant1 = 0;
+     * resultat = 0;
+     * textAreaResultat.setText("0");
+     * textAreaHistorial.setText("0");
+     * break;
+     * default:
+     * // numeros
+     * if (resultat != 0) {
+     * operant1 *= 10;
+     * operant1 += Integer.parseInt(valor);
+     * textAreaHistorial.setText(
+     * String.valueOf(textAreaHistorial.getText() +
+     * df.format(Integer.parseInt(valor))));
+     * 
+     * } else {
+     * operant1 *= 10;
+     * operant1 += Integer.parseInt(valor);
+     * textAreaHistorial.setText(String.valueOf(df.format(operant1)));
+     * }
+     * 
+     * textAreaResultat.setText(String.valueOf(df.format(operant1)));
+     * break;
+     * }
+     * }
+     * 
+     * }
+     * 
+     * private double operar(double a, double b, char operacio) {
+     * double resultat = 0;
+     * switch (operacio) {
+     * 
+     * case '-':
+     * resultat = a - b;
+     * break;
+     * case '*':
+     * resultat = a * b;
+     * break;
+     * case '/':
+     * resultat = a / b;
+     * break;
+     * 
+     * default:
+     * resultat = a + b;
+     * break;
+     * 
+     * }
+     * return resultat;
+     * }
+     */
 }

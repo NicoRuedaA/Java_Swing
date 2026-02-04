@@ -7,6 +7,6 @@ public class Main {
     public static void main(String[] args) {
         FlatDarculaLaf.setup();
 
-        CalculadoraVisual calculadora = new CalculadoraVisual();
+        Calculadora calculadora = new Calculadora();
     }
 }
