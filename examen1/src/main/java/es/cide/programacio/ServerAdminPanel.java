@@ -6,6 +6,9 @@ import javax.swing.border.TitledBorder;
 
 import org.w3c.dom.Text;
 
+import com.formdev.flatlaf.FlatDarculaLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+
 import java.awt.*;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.FocusListener;
@@ -14,7 +17,9 @@ public class ServerAdminPanel extends JFrame {
 
     public static void main(String[] args) {
         // cream un objete tipus ServerAdminPanel
+        FlatLightLaf.setup();
         ServerAdminPanel finestra = new ServerAdminPanel();
+
     }
 
     // constructor tipo ServerAdminPanel
@@ -31,7 +36,9 @@ public class ServerAdminPanel extends JFrame {
 
         // ***GRID***/
         // cream un grid.
-        JPanel grid = new JPanel(new GridLayout(9, 1, 15, 15));
+        JPanel grid = new JPanel();
+        grid.setLayout(new BoxLayout(grid, BoxLayout.Y_AXIS));
+        grid.setBorder(new EmptyBorder(15, 15, 15, 15));
         // ceamos empty border
         EmptyBorder emptyBorder = new EmptyBorder(10, 10, 10, 10);
         // afegim empty border
@@ -89,15 +96,12 @@ public class ServerAdminPanel extends JFrame {
     JLabel textVocal = new JLabel();
 
     private void configureGrid9(JPanel g) {
-
-        // Assignam texte al Jlabel
-        textVocal.setText("Número de vocales: ");
-
+        textVocal.setText("Número de vocales: 0");
         g.add(textVocal);
     }
 
     private void configureGrid8(JPanel g) {
-        JButton contarButton = new JButton("Contar Vocales:");
+        JButton contarButton = new JButton("Contar Vocales");
         contarButton.addActionListener(e -> contarVocales());
         g.add(contarButton);
     }
@@ -106,32 +110,24 @@ public class ServerAdminPanel extends JFrame {
 
     public void contarVocales() {
         numeroVocales = 0;
+        // ACTUALIZACIÓN: Leemos el texto actual del JTextArea antes de contar
+        titulo = textTitulo.getText().toLowerCase();
 
         for (int i = 0; i < titulo.length(); i++) {
-
             if (titulo.charAt(i) == (vocalAcontar.charAt(0))) {
-                System.out.println((vocalAcontar.charAt(0)));
                 numeroVocales++;
             }
         }
-
         textVocal.setText("Número de vocales: " + numeroVocales);
-
     }
 
-    String vocalAcontar;
+    String vocalAcontar = "a";
 
     private void configureGrid7(JPanel g) {
-        JLabel text = new JLabel("Selecciona una vocal:");
-        JComboBox<Character> comboBox = new JComboBox<>();
+        JLabel text = new JLabel("Selecciona una vocal: ");
+        Character[] vocales = { 'a', 'e', 'i', 'o', 'u' };
+        JComboBox<Character> comboBox = new JComboBox<>(vocales);
 
-        comboBox.addItem('a');
-        comboBox.addItem('e');
-        comboBox.addItem('i');
-        comboBox.addItem('o');
-        comboBox.addItem('u');
-
-        // botoClear.addActionListener(e -> registrarAccion(" "));
         comboBox.addActionListener(e -> cambiarVocal(comboBox.getSelectedItem().toString()));
 
         g.add(text);
@@ -145,11 +141,7 @@ public class ServerAdminPanel extends JFrame {
     JLabel textFicha = new JLabel();
 
     private void configureGrid6(JPanel g) {
-
-        // Pel·lícula: [Títol] | Gènere: [Gènere] | Any: [Any]
-
-        // Assignam texte al Jlabel
-
+        textFicha.setText(" "); // Espacio inicial
         g.add(textFicha);
     }
 
@@ -160,84 +152,54 @@ public class ServerAdminPanel extends JFrame {
     }
 
     public void mostrarFicha() {
-        textFicha.setText("Película: " + titulo + " Género: " + genero + " Año: " + anno);
-        annoSeleccionadoText.setText(anno);
+        titulo = textTitulo.getText();
+        textFicha.setText("Película: " + titulo + " | Género: " + genero + " | Año: " + anno);
     }
 
-    int annoSeleccionado = 2000;
     JLabel annoSeleccionadoText = new JLabel();
 
     private void configureGrid4(JPanel g) {
-
-        // cream Jlabel
-
-        JLabel textTopLeft2 = new JLabel();
-
-        // Assignam texte al Jlabel
-        textTopLeft2.setText("Año seleccionado:");
+        JLabel textTopLeft2 = new JLabel("Año seleccionado: ");
         annoSeleccionadoText.setText("2000");
-
-        // afegim els JLabel al JaPanel
         g.add(textTopLeft2);
         g.add(annoSeleccionadoText);
 
     }
 
-    String anno;
+    String anno = "2000";
 
     private void configureGrid3(JPanel g) {
+        JLabel textBotLeft1 = new JLabel("Año de estreno: ");
+        JSlider slider = new JSlider(1900, 2025, 2000);
 
-        // cream JLabel
-        JLabel textBotLeft1 = new JLabel();
-        // cream text
-        textBotLeft1.setText("Año de estreno:");
-        // afegim borde al text
+        slider.setMajorTickSpacing(25);
+        slider.setMinorTickSpacing(5);
+        slider.setPaintTicks(true);
+        slider.setPaintLabels(true);
+        slider.setFont(new Font("SansSerif", Font.PLAIN, 10));
 
-        // cream un Sliders
-        JSlider sliderBotLeft1 = new JSlider(1900, 2025);
+        slider.addChangeListener(e -> cambiarAnno(slider.getValue()));
 
-        sliderBotLeft1.setMajorTickSpacing(25);
-
-        sliderBotLeft1.setMinorTickSpacing(5);
-        // dibuixam ses retxes
-        sliderBotLeft1.setPaintTicks(true);
-        // dibuixam els numeros
-        sliderBotLeft1.setPaintLabels(true);
-
-        sliderBotLeft1.setFont(new Font("Monospaced", 0, 10));
-        sliderBotLeft1.addChangeListener(e -> cambiarAnno(sliderBotLeft1.getValue()));
-
-        // sliderBotLeft1.addAdjustmentListener(e -> cambiarString(" "));
-
-        // afegim els components
         g.add(textBotLeft1);
-        g.add(sliderBotLeft1);
+        g.add(slider);
 
     }
 
     public void cambiarAnno(int s) {
         anno = Integer.toString(s);
+        annoSeleccionadoText.setText(anno);
     }
 
-    String genero;
+    String genero = "Acción";
 
     private void configureGrid2(JPanel g, EmptyBorder b) {
         // cream Jlabel
-        JLabel textTopLeft1 = new JLabel();
-        JComboBox<String> comboBox = new JComboBox<>();
-
-        // Assignam texte al Jlabel
-        textTopLeft1.setText("Género:");
-
-        comboBox.addItem("Acción");
-        comboBox.addItem("Comedia");
-        comboBox.addItem("Drama");
-        comboBox.addItem("Terror");
-        comboBox.addItem("Ciencia Ficción");
+        JLabel textTopLeft1 = new JLabel("Género: ");
+        JComboBox<String> comboBox = new JComboBox<>(
+                new String[] { "Acción", "Comedia", "Drama", "Terror", "Ciencia Ficción" });
 
         comboBox.addActionListener(e -> cambiarGenero(comboBox.getSelectedItem().toString()));
 
-        // afegim els JLabel al JaPanel
         g.add(textTopLeft1);
         g.add(comboBox);
     }
@@ -250,18 +212,12 @@ public class ServerAdminPanel extends JFrame {
     String titulo = "Star Wars: A new hope";
 
     private void configureGrid1(JPanel g) {
-        // cream Jlabel
+        JLabel textArea = new JLabel("Título de la película: ");
+        textTitulo.setText(titulo);
 
-        JLabel textArea = new JLabel();
+        // Un pequeño borde para que parezca un campo de texto
+        textTitulo.setBorder(UIManager.getBorder("TextField.border"));
 
-        // Assignam texte al Jlabel
-        textArea.setText("Títol de la película:");
-        textTitulo.setText(
-                "Star Wars: A new hope");
-
-        // textTitulo.addFocusListener(null);
-
-        // afegim els JLabel al JaPanel
         g.add(textArea);
         g.add(textTitulo);
 
@@ -269,16 +225,6 @@ public class ServerAdminPanel extends JFrame {
 
     public void cambiarTitulo(String s) {
         titulo = s;
-    }
-
-    private void setTheme(String s) {
-        // importam el tema amb try catch per prevenir errors
-        try {
-            UIManager.setLookAndFeel(s);
-            SwingUtilities.updateComponentTreeUI(this);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
 }
