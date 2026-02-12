@@ -4,11 +4,12 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentListener;
-
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import org.w3c.dom.Text;
 
-import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatLightLaf;
+//import com.formdev.flatlaf.FlatDarculaLaf;
+//import com.formdev.flatlaf.FlatLightLaf;
 
 import java.awt.*;
 import java.awt.event.AdjustmentListener;
@@ -27,25 +28,64 @@ import java.io.Serial;
 
 public class Panel extends JFrame {
 
+    // panel para organizar los componentes
+    JPanel grid;
+
+    // sub paneles para meter los componentes
+    JPanel subGrid1;
+    JPanel subGrid2;
+    JPanel subGrid3;
+    JPanel subGrid4;
+    JPanel subGrid5;
+    JPanel subGrid6;
+    JPanel subGrid7;
+
+    // componentes subgrid 1
+    JTextField textGrid1;
+    JLabel labelGrid1;
+    // componentes subgrid 2
+    JLabel label1Grid2;
+    JPanel panelGrid2; // creamos un subgrid en el subgrid para que el texto a introducir y el mensaje
+                       // de error sean proporcionales
+    JTextField textGrid2;
+    JLabel label2Grid2;
+    // componentes subgrid 3
+    JLabel labelGrid3;
+    JTextField textGrid3;
+    // componentes subgrid 4
+    JLabel labelGrid4;
+    JComboBox<String> comboBoxGrid4;
+    // componentes subgrid 5
+    JSlider sliderGrid5;
+    // componentes subgrid 6
+    JButton botoGrid6;
+    // componentes subgrid 7
+    JLabel labelGrid7;
+
+    // borde vacio
+    EmptyBorder emptyBorder;
+
+    // variables
+    String nomReserva;
+    String dni;
+    String data;
+    String nomHotel;
+    int numNits;
+
+    // objetos tipo hotel que guardan nombre y noches max
     Hotel hotelBlau = new Hotel("Hotel Blau", 3);
     Hotel hotelIlla = new Hotel("Hotel Illa", 10);
     Hotel hotelVall = new Hotel("Hotel Vall", 60);
-    Hotel hotelSelecc = new Hotel(" ", 0);
-
-    JLabel textVocal = new JLabel();
-    JLabel labelGrid7 = new JLabel(
-            " ");
-    JTextField textGrid1 = new JTextField();
-
-    String nom = "Luke Skywalker";
-    String dni = "44444444A";
-    String nomHotel = "Hotel Illa";
-
-    JSlider sliderGrid5 = new JSlider(1, 15, 9);
-
-    int numNits;
+    Hotel hotelSelecc = hotelIlla;
 
     public Panel() {
+        // inicializamos las variables
+        nomReserva = "Luke Skywalker";
+        dni = "44444444A";
+        nomHotel = hotelSelecc.getNom();
+        data = "07/03/2025";
+
+        // declaramos los hoteles
 
         // ***VENTANA***/
         // titol
@@ -59,22 +99,22 @@ public class Panel extends JFrame {
 
         // ***GRID***/
         // cream un grid.
-        JPanel grid = new JPanel();
+        grid = new JPanel();
         grid.setLayout(new BoxLayout(grid, BoxLayout.Y_AXIS));
         grid.setBorder(new EmptyBorder(15, 15, 15, 15));
-        // ceamos empty border
-        EmptyBorder emptyBorder = new EmptyBorder(10, 10, 10, 10);
+        // ceam empty border
+        emptyBorder = new EmptyBorder(10, 10, 10, 10);
         // afegim empty border
         grid.setBorder(emptyBorder);
 
         // cream 7 subrids
-        JPanel subGrid1 = new JPanel(new GridLayout(1, 2));
-        JPanel subGrid2 = new JPanel(new GridLayout(1, 2));
-        JPanel subGrid3 = new JPanel(new GridLayout(1, 2));
-        JPanel subGrid4 = new JPanel(new GridLayout(1, 2));
-        JPanel subGrid5 = new JPanel(new GridLayout(1, 1));
-        JPanel subGrid6 = new JPanel(new GridLayout(1, 1));
-        JPanel subGrid7 = new JPanel(new GridLayout(1, 1));
+        subGrid1 = new JPanel(new GridLayout(1, 2));
+        subGrid2 = new JPanel(new GridLayout(1, 2));
+        subGrid3 = new JPanel(new GridLayout(1, 2));
+        subGrid4 = new JPanel(new GridLayout(1, 2));
+        subGrid5 = new JPanel(new GridLayout(1, 1));
+        subGrid6 = new JPanel(new GridLayout(1, 1));
+        subGrid7 = new JPanel(new GridLayout(1, 1));
 
         // ***CONFIGURAM ELS SUBRIDS***/
         configureGrid1(subGrid1);
@@ -100,25 +140,22 @@ public class Panel extends JFrame {
 
         // feim visible el Jframe
         this.setVisible(true);
-        this.setResizable(false);
+        this.setResizable(true);
 
     }
 
     private void configureGrid7(JPanel g) {
-
+        // texto que muestra la inforamcion
+        labelGrid7 = new JLabel(
+                " ");
         g.add(labelGrid7);
 
     }
 
-    JLabel textFicha = new JLabel();
-
     private void configureGrid6(JPanel g) {
-        /*
-         * textFicha.setText(" "); // Espacio inicial
-         * g.add(textFicha);
-         */
-        JButton botoGrid6 = new JButton("Guardar reserva");
-
+        // boton
+        botoGrid6 = new JButton("Guardar reserva");
+        // accion al llamar al boton
         botoGrid6.addActionListener(e -> mostrarFicha());
 
         g.add(botoGrid6);
@@ -126,33 +163,33 @@ public class Panel extends JFrame {
     }
 
     private void configureGrid5(JPanel g) {
-
+        // slider
+        sliderGrid5 = new JSlider(1, 10, 9);
+        // config slider
         sliderGrid5.setMajorTickSpacing(1);
         sliderGrid5.setMinorTickSpacing(1);
         sliderGrid5.setPaintTicks(true);
         sliderGrid5.setPaintLabels(true);
         sliderGrid5.setFont(new Font("SansSerif", Font.PLAIN, 10));
 
+        // inicialiamos numnits
         numNits = sliderGrid5.getValue();
-
+        // evento al mover el slider
         sliderGrid5.addChangeListener(e -> cambiarNits(sliderGrid5.getValue()));
 
         g.add(sliderGrid5);
-        /*
-         * JButton mostraButton = new JButton("Mostrar Ficha:");
-         * mostraButton.addActionListener(e -> mostrarFicha());
-         * g.add(mostraButton);
-         */
+
     }
 
-    // JLabel hotelSelec = new JLabel();
-
     private void configureGrid4(JPanel g) {
-        JLabel labelGrid4 = new JLabel("Hotel: ");
+        // texto izquierda
+        labelGrid4 = new JLabel("Hotel: ");
 
-        JComboBox<String> comboBoxGrid4 = new JComboBox<>(
+        // desplegable para elegir hotel
+        comboBoxGrid4 = new JComboBox<>(
                 new String[] { hotelIlla.getNom(), hotelBlau.getNom(), hotelVall.getNom() });
 
+        // evento al elegit hotel
         comboBoxGrid4.addActionListener(e -> cambiarSlider(comboBoxGrid4.getSelectedItem().toString()));
 
         g.add(labelGrid4);
@@ -160,12 +197,11 @@ public class Panel extends JFrame {
 
     }
 
-    String data = "07/03/2025";
-
     private void configureGrid3(JPanel g) {
-
-        JLabel labelGrid3 = new JLabel("Data Check-in: (dd/MM/yyyy)");
-        JTextField textGrid3 = new JTextField(data);
+        // texto izquierda
+        labelGrid3 = new JLabel("Data Check-in: (dd/MM/yyyy)");
+        textGrid3 = new JTextField(data);
+        // comprobacion input
         textGrid3.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -182,7 +218,6 @@ public class Panel extends JFrame {
                 actualizarLabel(textGrid3.getText());
             }
 
-            // Método auxiliar para no repetir código
             private void actualizarLabel(String s) {
                 if (s.equals("")) {
                     errorData(1);
@@ -194,33 +229,33 @@ public class Panel extends JFrame {
             }
         });
 
-        /*
-         * textGrid3.addFocusListener(new FocusListener() {
-         * 
-         * @Override
-         * public void focusGained(FocusEvent e) {
-         * 
-         * }
-         * 
-         * @Override
-         * public void focusLost(FocusEvent e) {
-         * 
-         * }
-         * });
-         */
+        textGrid3.addFocusListener(new FocusListener() {
+
+            @Override
+            public void focusGained(FocusEvent e) {
+
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+
+            }
+        });
 
         g.add(labelGrid3);
         g.add(textGrid3);
     }
 
     private void configureGrid2(JPanel g, EmptyBorder b) {
-        // cream Jlabel
-        JLabel label1Grid2 = new JLabel("DNI: ");
-        JPanel panelGrid2 = new JPanel(new GridLayout(1, 2));
+        // texto iqzuierda
+        label1Grid2 = new JLabel("DNI: ");
+        // sub grid
+        panelGrid2 = new JPanel(new GridLayout(1, 2));
 
-        JTextField textGrid2 = new JTextField(dni);
-        JLabel label2Grid2 = new JLabel(" ");
+        textGrid2 = new JTextField(dni);
+        label2Grid2 = new JLabel(" ");
 
+        // evento
         textGrid2.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -258,8 +293,11 @@ public class Panel extends JFrame {
     }
 
     private void configureGrid1(JPanel g) {
-        JLabel labelGrid1 = new JLabel("Nom: ");
-        textGrid1.setText(nom);
+        // texto
+        textGrid1 = new JTextField();
+        labelGrid1 = new JLabel("Nom: ");
+        // input
+        textGrid1.setText(nomReserva);
 
         // petit borde
         textGrid1.setBorder(UIManager.getBorder("TextField.border"));
@@ -269,10 +307,12 @@ public class Panel extends JFrame {
 
     }
 
+    // modificamos variable
     public void cambiarTitulo(String s) {
-        nom = s;
+        nomReserva = s;
     }
 
+    // modificamos noche
     public void cambiarNits(int s) {
         System.out.println(s);
         System.out.println(hotelSelecc.getNits());
@@ -284,6 +324,7 @@ public class Panel extends JFrame {
 
     }
 
+    // modificamos valor maximo slider
     public void cambiarSlider(String s) {
         if (s.equals("Hotel Illa")) {
             hotelSelecc = hotelIlla;
@@ -295,18 +336,18 @@ public class Panel extends JFrame {
         sliderGrid5.setMaximum(hotelSelecc.getNits());
     }
 
-    public void cambiarGenero(String s) {
-        dni = s;
-    }
-
+    // mostramos los datos
     public void mostrarFicha() {
-        labelGrid7.setText("Reserva: " + nom + ", " + dni + ", " + data + ", " + nomHotel + ", " + numNits + " nits");
+        labelGrid7.setText(
+                "Reserva: " + nomReserva + ", " + dni + ", " + data + ", " + nomHotel + ", " + numNits + " nits");
     }
 
+    // mostramso advertencia
     public void mostrarAdv() {
         labelGrid7.setText("Estada máxima a aquest hotel");
     }
 
+    // limpiamos el mensaje del grid
     public void limpGrid7() {
         labelGrid7.setText(" ");
     }
@@ -353,6 +394,7 @@ public class Panel extends JFrame {
         }
     }
 
+    // mensaje de error
     public void errorData(int x) {
         if (x == 1) {
             labelGrid7.setText("no pot estar buida");
