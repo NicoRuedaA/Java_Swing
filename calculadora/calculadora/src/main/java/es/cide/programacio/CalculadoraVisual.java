@@ -5,59 +5,100 @@ import javax.swing.border.EmptyBorder;
 
 import java.awt.*;
 import java.text.DecimalFormat;
-import javax.swing.border.TitledBorder;
-import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.FlatLightLaf;
-import com.formdev.flatlaf.FlatIntelliJLaf;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
+
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 
-public class CalculadoraVisual extends CalculadoraLogica {
+public class CalculadoraVisual extends JFrame {
 
-    FlatSVGIcon icono1 = new FlatSVGIcon("icons/1.svg");
-    FlatSVGIcon icono2 = new FlatSVGIcon("icons/2.svg");
-    FlatSVGIcon icono3 = new FlatSVGIcon("icons/3.svg");
-    FlatSVGIcon icono4 = new FlatSVGIcon("icons/4.svg");
-    FlatSVGIcon icono5 = new FlatSVGIcon("icons/5.svg");
-    FlatSVGIcon icono6 = new FlatSVGIcon("icons/6.svg");
-    FlatSVGIcon icono7 = new FlatSVGIcon("icons/7.svg");
-    FlatSVGIcon icono8 = new FlatSVGIcon("icons/8.svg");
-    FlatSVGIcon icono9 = new FlatSVGIcon("icons/9.svg");
-
-    JButton boto1 = new JButton("1", icono1);
-    JButton boto2 = new JButton("2", icono2);
-    JButton boto3 = new JButton("3", icono3);
-    JButton boto4 = new JButton("4", icono4);
-    JButton boto5 = new JButton("5", icono5);
-    JButton boto6 = new JButton("6", icono6);
-    JButton boto7 = new JButton("7", icono7);
-    JButton boto8 = new JButton("8", icono8);
-    JButton boto9 = new JButton("9", icono9);
-    JButton boto0 = new JButton("0");
-    JButton botoClear = new JButton("Clear");
-    JButton botoIgual = new JButton("=");
-    JButton botoSumar = new JButton("+");
-    JButton botoRestar = new JButton("-");
-    JButton botoMultiplicar = new JButton("*");
-    JButton botoDividir = new JButton("/");
-
-    DecimalFormat df = new DecimalFormat("####.##");
-
-    JTextArea textAreaResultat;
-    JTextArea textAreaHistorial;
     private static final int WIDTH = 500;
     private static final int HEIGHT = 800;
     private static final int ROWS = 6;
     private static final int COLS = 1;
 
-    double operant1 = 0;
-    double operant2 = 0;
-    double resultat = 0;
+    FlatSVGIcon icono1;
+    FlatSVGIcon icono2;
+    FlatSVGIcon icono3;
+    FlatSVGIcon icono4;
+    FlatSVGIcon icono5;
+    FlatSVGIcon icono6;
+    FlatSVGIcon icono7;
+    FlatSVGIcon icono8;
+    FlatSVGIcon icono9;
 
-    char operacio = ' ';
+    protected JButton boto1;
+    protected JButton boto2;
+    protected JButton boto3;
+    protected JButton boto4;
+    protected JButton boto5;
+    protected JButton boto6;
+    protected JButton boto7;
+    protected JButton boto8;
+    protected JButton boto9;
+    protected JButton boto0;
+
+    protected JButton botoClear;
+    protected JButton botoIgual;
+    protected JButton botoSumar;
+    protected JButton botoRestar;
+    protected JButton botoMultiplicar;
+    protected JButton botoDividir;
+
+    protected JTextArea textAreaResultat;
+    protected JTextArea textAreaHistorial;
+
+    private void cargarImagenes() {
+        icono1 = new FlatSVGIcon("icons/1.svg");
+        icono2 = new FlatSVGIcon("icons/2.svg");
+        icono3 = new FlatSVGIcon("icons/3.svg");
+        icono4 = new FlatSVGIcon("icons/4.svg");
+        icono5 = new FlatSVGIcon("icons/5.svg");
+        icono6 = new FlatSVGIcon("icons/6.svg");
+        icono7 = new FlatSVGIcon("icons/7.svg");
+        icono8 = new FlatSVGIcon("icons/8.svg");
+        icono9 = new FlatSVGIcon("icons/9.svg");
+    }
+
+    private void inicializarBotones() {
+
+        boto1 = new JButton("1", icono1);
+        boto2 = new JButton("2", icono2);
+        boto3 = new JButton("3", icono3);
+        boto4 = new JButton("4", icono4);
+        boto5 = new JButton("5", icono5);
+        boto6 = new JButton("6", icono6);
+        boto7 = new JButton("7", icono7);
+        boto8 = new JButton("8", icono8);
+        boto9 = new JButton("9", icono9);
+        boto0 = new JButton("0");
+        botoClear = new JButton("Clear");
+        botoIgual = new JButton("=");
+        botoSumar = new JButton("+");
+        botoRestar = new JButton("-");
+        botoMultiplicar = new JButton("*");
+        botoDividir = new JButton("/");
+
+        boto1.setName("boto1");
+        boto2.setName("boto2");
+        boto3.setName("boto3");
+        boto4.setName("boto4");
+        boto5.setName("boto5");
+        boto6.setName("boto6");
+        boto7.setName("boto7");
+        boto8.setName("boto8");
+        boto9.setName("boto9");
+        boto0.setName("boto0");
+
+        botoClear.setName("botoClear");
+        botoIgual.setName("botoIgual");
+        botoSumar.setName("botoSumar");
+        botoRestar.setName("botoRestar");
+        botoMultiplicar.setName("botoMultiplicar");
+        botoDividir.setName("botoDividir");
+    }
 
     public CalculadoraVisual() {
+        cargarImagenes();
+        inicializarBotones();
 
         textAreaResultat = new JTextArea();
         textAreaHistorial = new JTextArea();
@@ -122,89 +163,10 @@ public class CalculadoraVisual extends CalculadoraLogica {
             System.out.println("No se pudo cargar el icono: " + e.getMessage());
         }
 
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
-            @Override
-            public boolean dispatchKeyEvent(KeyEvent e) {
-                // si pulsamos una tecla
-                if (e.getID() == KeyEvent.KEY_PRESSED) {
-                    // guardamos la tecla pulsada en un char
-                    char c = e.getKeyChar();
-                    // guardamos el codigo de la tecla pulsada en un int
-                    int codigo = e.getKeyCode();
-                    // si la tecla es un digito
-                    if (Character.isDigit(c)) {
-                        // registrarAccion(String.valueOf(c));
-                        switch (c) {
-                            case '1':
-                                boto1.doClick();
-                                break;
-                            case '2':
-                                boto2.doClick();
-                                break;
-                            case '3':
-                                boto3.doClick();
-                                break;
-                            case '4':
-                                boto4.doClick();
-                                break;
-                            case '5':
-                                boto5.doClick();
-                                break;
-                            case '6':
-                                boto6.doClick();
-                                break;
-                            case '7':
-                                boto7.doClick();
-                                break;
-                            case '8':
-                                boto8.doClick();
-                                break;
-                            case '9':
-                                boto9.doClick();
-                                break;
-                            case '0':
-                                boto0.doClick();
-                                break;
-                        }
-                    } else {
-                        // si la tecla es enter
-                        if (codigo == KeyEvent.VK_ENTER) {
-                            // registrarAccion("=");
-                            botoIgual.doClick();
-                            // si la tecla es el boton de borrar
-                        } else if (codigo == KeyEvent.VK_BACK_SPACE) {
-                            // registrarAccion(" ");
-                            botoClear.doClick();
-                            // si es un boton de +, -, *, /
-                        } else if (c == '+' || c == '-' || c == '*' || c == '/') {
-                            // registrarAccion(String.valueOf(c));
-                            if (c == '+') {
-                                botoSumar.doClick();
-                            } else if (c == '-') {
-                                botoRestar.doClick();
-                            } else if (c == '*') {
-                                botoMultiplicar.doClick();
-                            } else if (c == '/') {
-                                botoDividir.doClick();
-
-                            }
-                        }
-                    }
-                }
-                return false;
-            }
-        });
-
     }
 
     private void configureFila6(JPanel g) {
 
-        botoClear.addActionListener(e -> registrarAccion(" "));
-        botoSumar.addActionListener(e -> registrarAccion("+"));
-
-        botoIgual.addActionListener(e -> registrarAccion("="));
-
-        boto0.addActionListener(e -> registrarAccion("0"));
         g.add(botoClear);
         g.add(boto0);
 
@@ -221,12 +183,6 @@ public class CalculadoraVisual extends CalculadoraLogica {
 
         boto3.setFont(new Font("Arial", Font.PLAIN, 0));
 
-        boto1.addActionListener(e -> registrarAccion("1"));
-
-        boto2.addActionListener(e -> registrarAccion("2"));
-        boto3.addActionListener(e -> registrarAccion("3"));
-        botoRestar.addActionListener(e -> registrarAccion("-"));
-
         g.add(boto1);
         g.add(boto2);
         g.add(boto3);
@@ -241,12 +197,6 @@ public class CalculadoraVisual extends CalculadoraLogica {
         boto5.setFont(new Font("Arial", Font.PLAIN, 0));
 
         boto6.setFont(new Font("Arial", Font.PLAIN, 0));
-
-        boto4.addActionListener(e -> registrarAccion("4"));
-
-        boto5.addActionListener(e -> registrarAccion("5"));
-        boto6.addActionListener(e -> registrarAccion("6"));
-        botoMultiplicar.addActionListener(e -> registrarAccion("*"));
 
         g.add(boto4);
         g.add(boto5);
@@ -263,12 +213,6 @@ public class CalculadoraVisual extends CalculadoraLogica {
 
         boto9.setFont(new Font("Arial", Font.PLAIN, 0));
 
-        boto7.addActionListener(e -> registrarAccion("7"));
-
-        boto8.addActionListener(e -> registrarAccion("8"));
-        boto9.addActionListener(e -> registrarAccion("9"));
-        botoDividir.addActionListener(e -> registrarAccion("/"));
-
         g.add(boto7);
         g.add(boto8);
         g.add(boto9);
@@ -277,13 +221,10 @@ public class CalculadoraVisual extends CalculadoraLogica {
     }
 
     private void configureFila2(JPanel g, JTextArea text) {
-        // cream titol-border
         // set text del text area
         text.setText("0");
         // el text area no es editable
         text.setEditable(false);
-        // establim sa font
-
         // numero de columnes i files
         text.setRows(1);
         text.setColumns(40);
@@ -291,7 +232,6 @@ public class CalculadoraVisual extends CalculadoraLogica {
     }
 
     private void configureFila1(JPanel g) {
-
         // set text del text area
         textAreaHistorial.setText("");
         // el text area no es editable
@@ -304,94 +244,31 @@ public class CalculadoraVisual extends CalculadoraLogica {
         g.add(textAreaHistorial);
     }
 
-    /*
-     * public void registrarAccion(String valor) {
-     * 
-     * // operaciones aritmeticas
-     * if (valor.equals("+") || valor.equals("-") || valor.equals("*") ||
-     * valor.equals("/")) {
-     * if (operant1 == 0) {
-     * textAreaHistorial.setText(resultat + " " + valor + " ");
-     * } else {
-     * resultat += operant1;
-     * textAreaHistorial.setText(textAreaHistorial.getText() + " " + valor + " ");
-     * textAreaResultat.setText(String.valueOf(resultat));
-     * 
-     * }
-     * operant1 = 0;
-     * 
-     * operacio = valor.charAt(0);
-     * }
-     * // el resto
-     * else {
-     * switch (valor) {
-     * case ".":
-     * break;
-     * 
-     * case "=":
-     * if ((operacio == '/') && (operant1 == 0)) {
-     * textAreaHistorial.setText("No se puede dividir por 0");
-     * textAreaResultat.setText("No se puede dividir por 0");
-     * resultat = 0;
-     * } else {
-     * resultat = operar(resultat, operant1, operacio);
-     * textAreaHistorial.setText(textAreaHistorial.getText() + " = ");
-     * 
-     * textAreaResultat.setText(String.valueOf(resultat));
-     * 
-     * }
-     * operant1 = 0;
-     * 
-     * break;
-     * case " ":
-     * operacio = ' ';
-     * operant1 = 0;
-     * resultat = 0;
-     * textAreaResultat.setText("0");
-     * textAreaHistorial.setText("0");
-     * break;
-     * default:
-     * // numeros
-     * if (resultat != 0) {
-     * operant1 *= 10;
-     * operant1 += Integer.parseInt(valor);
-     * textAreaHistorial.setText(
-     * String.valueOf(textAreaHistorial.getText() +
-     * df.format(Integer.parseInt(valor))));
-     * 
-     * } else {
-     * operant1 *= 10;
-     * operant1 += Integer.parseInt(valor);
-     * textAreaHistorial.setText(String.valueOf(df.format(operant1)));
-     * }
-     * 
-     * textAreaResultat.setText(String.valueOf(df.format(operant1)));
-     * break;
-     * }
-     * }
-     * 
-     * }
-     * 
-     * private double operar(double a, double b, char operacio) {
-     * double resultat = 0;
-     * switch (operacio) {
-     * 
-     * case '-':
-     * resultat = a - b;
-     * break;
-     * case '*':
-     * resultat = a * b;
-     * break;
-     * case '/':
-     * resultat = a / b;
-     * break;
-     * 
-     * default:
-     * resultat = a + b;
-     * break;
-     * 
-     * }
-     * return resultat;
-     * }
-     */
+    // busqueda On ya que los botones son pocoas y hacer mapas está feo
+    public JButton getButton(String name) {
+        return findButton(this.getContentPane(), name);
+    }
+
+    private JButton findButton(Container container, String name) {
+        for (Component c : container.getComponents()) {
+            if (name.equals(c.getName()))
+                return (JButton) c;
+            if (c instanceof Container) {
+                JButton found = findButton((Container) c, name);
+                if (found != null)
+                    return found;
+            }
+        }
+        return null;
+    }
+
+    public JTextArea getTextArea(String s) {
+        for (Component c : this.getComponents()) {
+            if (c instanceof JTextArea && s.equals(c.getName())) {
+                return (JTextArea) c;
+            }
+        }
+        return null;
+    }
+
 }
