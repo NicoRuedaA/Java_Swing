@@ -13,7 +13,7 @@ public class Main {
         CalculadoraLogica logica = new CalculadoraLogica();
 
         // 3. El controlador las une
-        new CalculadoraListener(vista, logica);
+        CalculadoraListener calculadora = new CalculadoraListener(vista, logica);
 
         vista.setVisible(true);
     }

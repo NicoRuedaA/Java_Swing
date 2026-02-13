@@ -10,7 +10,7 @@ import java.awt.event.KeyEvent;
 public class CercleRebotant extends JPanel implements ActionListener {
     private int xPilota = 10, yPilota = 10; // Coordenades inicials del cercle
     private double dxPilota = 2, dyPilota = 2; // Velocitat del moviment en X i Y
-    private double xRectangle1 = 50, yRectangle1 = 50;
+    private double xRectangle1 = 200, yRectangle1 = 100;
     private double xRectangleSize1 = 50, yRectangleSize1 = 50;
     private double xRectangle2 = 150, yRectangle2 = 50;
     private double xRectangleSize2 = 50, yRectangleSize2 = 50;
@@ -18,6 +18,9 @@ public class CercleRebotant extends JPanel implements ActionListener {
     private final int RADI = 20; // Radi del cercle
     private final int DELAY = 10; // Retard del temporitzador en mil·lisegons
     private Timer timer; // Temporitzador per controlar l'animació
+
+    double posXpilota;
+    double posYpilota;
 
     // Constructor que inicialitza el panell i inicia el temporitzador
     public CercleRebotant() {
@@ -38,21 +41,34 @@ public class CercleRebotant extends JPanel implements ActionListener {
         r1.setColor(Color.green);
         r1.fillRect((int) xRectangle1, (int) yRectangle1, (int) xRectangleSize1, (int) yRectangleSize1);
 
-        Graphics2D r2 = (Graphics2D) g;
-        r2.setColor(Color.blue);
-        r2.fillRect((int) xRectangle2, (int) yRectangle2, (int) xRectangleSize2, (int) yRectangleSize2);
-
         /*
          * Graphics2D r2 = (Graphics2D) g;
-         * r1.setColor(Color.blue);
-         * r1.fillRect(50, 100, 50, 50);
+         * r2.setColor(Color.blue);
          */
+
+        Graphics2D l1 = (Graphics2D) g;
+        l1.fillRect((int) xRectangle1, (int) (yRectangle1), 1, 1000);
+        l1.setColor(Color.yellow);
+
+        Graphics2D l2 = (Graphics2D) g;
+        l2.fillRect((int) (xRectangle1 + xRectangleSize1), (int) (yRectangle1), 1, 1000);
+        l2.setColor(Color.yellow);
+
+        Graphics2D l3 = (Graphics2D) g;
+        l3.fillRect((int) xRectangle1, (int) (yRectangle1), 1000, 1);
+        l3.setColor(Color.yellow);
+
+        Graphics2D l4 = (Graphics2D) g;
+        l4.fillRect((int) xRectangle1, (int) (yRectangle1 + yRectangleSize1), 1000, 1);
+        l4.setColor(Color.yellow);
 
     }
 
     // Mètode que s'executa a cada tic del temporitzador per moure el cercle
     @Override
     public void actionPerformed(ActionEvent e) {
+        posXpilota = xPilota + 2 * RADI;
+        posYpilota = yPilota + 2 * RADI;
         // Comprova si el cercle toca les vores horitzontals
         if (xPilota + 2 * RADI >= getWidth() || xPilota <= 0) {
             dxPilota = -dxPilota; // Inverteix la direcció horitzontal
@@ -68,15 +84,29 @@ public class CercleRebotant extends JPanel implements ActionListener {
          * dyPilota = -dyPilota;
          * }
          */
-        if (yPilota >= yRectangle1 - yRectangleSize1) {
-            if (xPilota <= xRectangle1) {
+        /*
+         * if ((xPilota + 2 * RADI >= xRectangle1 - xRectangleSize1)
+         * && (yPilota + 2 * RADI <= yRectangle1 + yRectangleSize1)) {
+         * if ((xPilota + 2 * RADI <= xRectangle1 - xRectangleSize1))
+         */
+        if ((posXpilota >= xRectangle1) && (posXpilota <= xRectangle1 + xRectangleSize1) && (posYpilota > yRectangle1)
+                && (posYpilota < yRectangle1 + yRectangleSize1)) {
+            if ((posYpilota > yRectangle1) || (posYpilota > yRectangle1 + yRectangleSize1)) {
                 dyPilota = -dyPilota;
-                System.out.println("toca");
             }
 
-            // Actualitza la posició del cercle
-
+            System.out.println("toca");
         }
+
+        // dxPilota = -dxPilota;
+
+        // || (xPilota + 2 * RADI >= xRectangle1 + xRectangleSize1)
+        // }
+
+        // dyPilota = -dyPilota;
+
+        // Actualitza la posició del cercle
+
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {

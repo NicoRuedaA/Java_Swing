@@ -70,7 +70,7 @@ class CalculadoraListener {
         botoDividir = calculadoraVisual.getButton("botoDividir");
 
         textAreaHistorial = calculadoraVisual.getTextArea("textAreaHistorial");
-        textAreaResultat = calculadoraVisual.getTextArea("textAreaHistorial");
+        textAreaResultat = calculadoraVisual.getTextArea("textAreaResultat");
     }
 
     public CalculadoraListener(CalculadoraVisual vista, CalculadoraLogica logica) {
@@ -80,8 +80,6 @@ class CalculadoraListener {
 
         operant1 = 0;
         operant2 = 0;
-
-        calculadoraVisual = new CalculadoraVisual();
 
         inicializarComponentes();
 
@@ -108,6 +106,8 @@ class CalculadoraListener {
         botoIgual.addActionListener(e -> registrarAccion("="));
 
         boto0.addActionListener(e -> registrarAccion("0"));
+
+        listenKey();
 
     }
 
@@ -189,70 +189,53 @@ class CalculadoraListener {
     }
 
     public void registrarAccion(String valor) {
+        // 1. GESTIÓN DE NÚMEROS (Concatenación)
+        if (Character.isDigit(valor.charAt(0))) {
+            // Multiplicamos por 10 para desplazar el dígito a la izquierda y sumamos el
+            // nuevo
+            operant1 = (operant1 * 10) + Double.parseDouble(valor);
 
-        // operaciones aritmeticas
-        if (valor.equals("+") || valor.equals("-") || valor.equals(" ") ||
-                valor.equals("/")) {
-            if (operant1 == 0) {
-                textAreaHistorial.setText(calculadoraLogica.getResultat() + " " + valor + " ");
-            } else {
-                resultat += operant1;
-                textAreaHistorial.setText(textAreaHistorial.getText() + " " + valor + " ");
-                textAreaResultat.setText(String.valueOf(resultat));
+            textAreaResultat.setText(df.format(operant1));
+            return; // Salimos para no procesar el resto como operación
+        }
 
+        // 2. GESTIÓN DE OPERACIONES (+, -, *, /)
+        if (valor.equals("+") || valor.equals("-") || valor.equals("*") || valor.equals("/")) {
+            if (resultat == 0) {
+                resultat = operant1; // Primer número introducido
+            } else if (operant1 != 0) {
+                // Si ya hay un número pendiente, lo operamos antes de cambiar al nuevo signo
+                resultat = calculadoraLogica.operar(resultat, operant1, operacio);
             }
-            operant1 = 0;
 
             operacio = valor.charAt(0);
+            textAreaHistorial.setText(df.format(resultat) + " " + operacio + " ");
+            textAreaResultat.setText(df.format(resultat));
+            operant1 = 0; // Reset para el siguiente número
         }
 
+        // 3. CASOS ESPECIALES (C, =)
         else {
             switch (valor) {
-                case ".":
-                    break;
-
                 case "=":
-                    if ((operacio == '/') && (operant1 == 0)) {
-                        textAreaHistorial.setText("No se puede dividir por 0");
-                        textAreaResultat.setText("No se puede dividir por 0");
-                        resultat = 0;
+                    if (operacio == '/' && operant1 == 0) {
+                        textAreaResultat.setText("Error: Div/0");
                     } else {
                         resultat = calculadoraLogica.operar(resultat, operant1, operacio);
-                        textAreaHistorial.setText(textAreaHistorial.getText() + " = ");
-
-                        textAreaResultat.setText(String.valueOf(resultat));
-
+                        textAreaHistorial.setText(textAreaHistorial.getText() + df.format(operant1) + " = ");
+                        textAreaResultat.setText(df.format(resultat));
                     }
-                    operant1 = 0;
-
+                    operant1 = 0; // Importante para permitir una nueva operación tras el igual
                     break;
-                case " ":
-                    operacio = ' ';
+
+                case " ": // Asegúrate de que este String coincida con el nombre del botón
                     operant1 = 0;
                     resultat = 0;
+                    operacio = ' ';
                     textAreaResultat.setText("0");
-                    textAreaHistorial.setText("0");
-                    break;
-                default:
-                    // numeros
-                    if (resultat != 0) {
-                        operant1 = 10;
-                        operant1 += Integer.parseInt(valor);
-                        textAreaHistorial.setText(
-                                String.valueOf(textAreaHistorial.getText() +
-                                        df.format(Integer.parseInt(valor))));
-
-                    } else {
-                        operant1 = 10;
-                        operant1 += Integer.parseInt(valor);
-                        textAreaHistorial.setText(String.valueOf(df.format(operant1)));
-                    }
-
-                    textAreaResultat.setText(String.valueOf(df.format(operant1)));
+                    textAreaHistorial.setText("");
                     break;
             }
         }
-
     }
-
 }

@@ -7,6 +7,15 @@ import java.awt.*;
 import java.text.DecimalFormat;
 
 import com.formdev.flatlaf.extras.FlatSVGIcon;
+import javax.swing.border.TitledBorder;
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.FlatIntelliJLaf;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyEvent;
+import java.text.DecimalFormat;
+import java.awt.event.KeyEvent;
 
 public class CalculadoraVisual extends JFrame {
 
@@ -94,14 +103,17 @@ public class CalculadoraVisual extends JFrame {
         botoRestar.setName("botoRestar");
         botoMultiplicar.setName("botoMultiplicar");
         botoDividir.setName("botoDividir");
+
+        textAreaResultat = new JTextArea();
+        textAreaHistorial = new JTextArea();
+
+        textAreaResultat.setName("textAreaResultat");
+        textAreaHistorial.setName("textAreaHistorial");
     }
 
     public CalculadoraVisual() {
         cargarImagenes();
         inicializarBotones();
-
-        textAreaResultat = new JTextArea();
-        textAreaHistorial = new JTextArea();
 
         textAreaHistorial.setBackground(new Color(100, 100, 100));
         textAreaResultat.setBackground(new Color(100, 100, 100));
@@ -263,12 +275,12 @@ public class CalculadoraVisual extends JFrame {
     }
 
     public JTextArea getTextArea(String s) {
-        for (Component c : this.getComponents()) {
-            if (c instanceof JTextArea && s.equals(c.getName())) {
-                return (JTextArea) c;
-            }
-        }
-        return null;
+        JTextArea text = new JTextArea();
+        if (s.equals("textAreaResultat")) {
+            text = textAreaResultat;
+        } else
+            text = textAreaHistorial;
+        return text;
     }
 
 }

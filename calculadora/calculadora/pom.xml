@@ -16,18 +16,12 @@
         <dependency>
             <groupId>com.formdev</groupId>
             <artifactId>flatlaf</artifactId>
-            <version>3.7</version>
+            <version>3.5.1</version>
         </dependency>
-
-
-
-        <!-- Source: https://mvnrepository.com/artifact/com.formdev/flatlaf-extras -->
         <dependency>
             <groupId>com.formdev</groupId>
             <artifactId>flatlaf-extras</artifactId>
-            <version>3.7</version>
-            <scope>compile</scope>
+            <version>3.5.1</version>
         </dependency>
-
     </dependencies>
 </project>
