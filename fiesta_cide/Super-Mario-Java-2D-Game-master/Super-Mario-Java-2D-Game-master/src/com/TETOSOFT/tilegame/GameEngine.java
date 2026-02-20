@@ -40,7 +40,7 @@ public class GameEngine extends GameCore {
         initInput();
 
         // start resource manager
-        mapLoader = new MapLoader(screen.getFullScreenWindow().getGraphicsConfiguration());
+        mapLoader = new MapLoader(screen.getWindow().getGraphicsConfiguration());
 
         // load resources
         drawer = new TileMapDrawer();
@@ -64,7 +64,7 @@ public class GameEngine extends GameCore {
         jump = new GameAction("jump", GameAction.DETECT_INITAL_PRESS_ONLY);
         exit = new GameAction("exit", GameAction.DETECT_INITAL_PRESS_ONLY);
 
-        inputManager = new InputManager(screen.getFullScreenWindow());
+        inputManager = new InputManager(screen.getWindow());
         inputManager.setCursor(InputManager.INVISIBLE_CURSOR);
 
         inputManager.mapToKey(moveLeft, KeyEvent.VK_LEFT);

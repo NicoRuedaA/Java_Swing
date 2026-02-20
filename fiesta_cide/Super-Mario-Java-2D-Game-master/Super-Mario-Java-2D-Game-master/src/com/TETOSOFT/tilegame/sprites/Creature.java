@@ -130,7 +130,7 @@ public abstract class Creature extends Sprite {
      * Updates the animaton for this creature.
      */
     public void update(long elapsedTime) {
-        // 1. Seleccionar la animación correcta según dirección y estado
+        // 1. Selección de la animación correcta (basado en velocidad)
         Animation newAnim = anim;
         if (getVelocityX() < 0) {
             newAnim = left;
@@ -138,39 +138,28 @@ public abstract class Creature extends Sprite {
             newAnim = right;
         }
 
-        if (state == STATE_DYING) {
-            if (newAnim == left)
-                newAnim = deadLeft;
-            else if (newAnim == right)
-                newAnim = deadRight;
+        // Lógica de muerte
+        if (state == STATE_DYING && newAnim == left) {
+            newAnim = deadLeft;
+        } else if (state == STATE_DYING && newAnim == right) {
+            newAnim = deadRight;
         }
 
-        // 2. Cambiar de animación si es necesario
+        // 2. Aplicar la animación
         if (anim != newAnim) {
             anim = newAnim;
             anim.start();
-        }
-
-        // 3. --- LÓGICA DE CONTROL DE FRAMES (Salto, Idle y Caminata) ---
-        if (state == STATE_NORMAL) {
-            if (getVelocityY() != 0) {
-                // SALTO: Si la velocidad vertical no es 0, usamos el 4º sprite (índice 3)
-                anim.setCurrFrame(3);
-            } else if (getVelocityX() == 0) {
-                // PARADO: Si no hay velocidad horizontal ni vertical, usamos el 5º sprite
-                // (índice 4)
-                anim.setCurrFrame(4);
+        } else {
+            // --- CAMBIO AQUÍ PARA EL IDLE ---
+            // Si el jugador está vivo y su velocidad es 0, forzamos el frame 5
+            if (state == STATE_NORMAL && getVelocityX() == 0) {
+                anim.setCurrFrame(4); // Índice 4 es el quinto sprite
             } else {
-                // CAMINANDO: Si se está moviendo, dejamos que la animación corra sus frames
-                // normales
                 anim.update(elapsedTime);
             }
-        } else {
-            // Si está muriendo, la animación de muerte se actualiza normalmente
-            anim.update(elapsedTime);
         }
 
-        // 4. Actualizar estado de muerte
+        // update to "dead" state
         stateTime += elapsedTime;
         if (state == STATE_DYING && stateTime >= DIE_TIME) {
             setState(STATE_DEAD);
