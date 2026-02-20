@@ -70,4 +70,13 @@ public class Animation {
             this.endTime = endTime;
         }
     }
+
+    // Dentro de Animation.java
+    public synchronized void setCurrFrame(int index) {
+        if (index >= 0 && index < frames.size()) {
+            currFrameIndex = index;
+            // Ajustamos el tiempo interno para que no salte al siguiente frame de inmediato
+            animTime = (index == 0) ? 0 : getFrame(index - 1).endTime;
+        }
+    }
 }
