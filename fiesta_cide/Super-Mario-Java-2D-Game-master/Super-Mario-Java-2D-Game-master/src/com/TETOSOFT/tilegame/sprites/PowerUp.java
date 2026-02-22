@@ -1,59 +1,45 @@
 package com.TETOSOFT.tilegame.sprites;
 
 import java.lang.reflect.Constructor;
-import com.TETOSOFT.graphics.*;
+import com.TETOSOFT.graphics.Animation;
+import com.TETOSOFT.graphics.Sprite;
 
 /**
-    A PowerUp class is a Sprite that the player can pick up.
-*/
+ * Base class for collectible items.
+ * Concrete types are defined as inner classes so adding new power-ups
+ * only requires a new inner class here.
+ */
 public abstract class PowerUp extends Sprite {
 
-    public PowerUp(Animation anim) {
-        super(anim);
-    }
+    public PowerUp(Animation anim) { super(anim); }
 
+    @Override
     public Object clone() {
-        // use reflection to create the correct subclass
-        Constructor constructor = getClass().getConstructors()[0];
+        Constructor<?> ctor = getClass().getConstructors()[0];
         try {
-            return constructor.newInstance(
-                new Object[] {(Animation)anim.clone()});
-        }
-        catch (Exception ex) {
-            // should never happen
+            return ctor.newInstance((Animation) anim.clone());
+        } catch (Exception ex) {
             ex.printStackTrace();
             return null;
         }
     }
 
+    // -------------------------------------------------------------------------
+    // Concrete types
+    // -------------------------------------------------------------------------
 
-    /**
-        A Star PowerUp. Gives the player points.
-    */
+    /** Collectible coin — gives the player points and eventually an extra life. */
     public static class Star extends PowerUp {
-        public Star(Animation anim) {
-            super(anim);
-        }
+        public Star(Animation anim) { super(anim); }
     }
 
-
-    /**
-        A Music PowerUp. Changes the game music.
-    */
+    /** Changes the background music. */
     public static class Music extends PowerUp {
-        public Music(Animation anim) {
-            super(anim);
-        }
+        public Music(Animation anim) { super(anim); }
     }
 
-
-    /**
-        A Goal PowerUp. Advances to the next map.
-    */
+    /** Advances the game to the next map. */
     public static class Goal extends PowerUp {
-        public Goal(Animation anim) {
-            super(anim);
-        }
+        public Goal(Animation anim) { super(anim); }
     }
-
 }

@@ -1,112 +1,95 @@
 package com.TETOSOFT.tilegame;
 
 import java.awt.Image;
-import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import com.TETOSOFT.graphics.Sprite;
 
 /**
-    The TileMap class contains the data for a tile-based
-    map, including Sprites. Each tile is a reference to an
-    Image. Of course, Images are used multiple times in the tile
-    map.
-*/
+ * Stores the tile grid and the list of sprites for one level.
+ * The player sprite is tracked separately from the rest.
+ */
 public class TileMap {
 
-    private Image[][] tiles;
-    private LinkedList sprites;
+    private final Image[][] tiles;
+    private final LinkedList<Sprite> sprites = new LinkedList<>();
     private Sprite player;
 
     /**
-        Creates a new TileMap with the specified width and
-        height (in number of tiles) of the map.
-    */
+     * @param width  map width in tiles
+     * @param height map height in tiles
+     */
     public TileMap(int width, int height) {
         tiles = new Image[width][height];
-        sprites = new LinkedList();
     }
 
+    // -------------------------------------------------------------------------
+    // Dimensions
+    // -------------------------------------------------------------------------
 
-    /**
-        Gets the width of this TileMap (number of tiles across).
-    */
     public int getWidth() {
         return tiles.length;
     }
 
-
-    /**
-        Gets the height of this TileMap (number of tiles down).
-    */
     public int getHeight() {
         return tiles[0].length;
     }
 
+    // -------------------------------------------------------------------------
+    // Tiles
+    // -------------------------------------------------------------------------
 
     /**
-        Gets the tile at the specified location. Returns null if
-        no tile is at the location or if the location is out of
-        bounds.
-    */
+     * Returns the tile image at (x, y), or {@code null} if the position is
+     * out of bounds or empty.
+     */
     public Image getTile(int x, int y) {
-        if (x < 0 || x >= getWidth() ||
-            y < 0 || y >= getHeight())
-        {
+        if (x < 0 || x >= getWidth() || y < 0 || y >= getHeight())
             return null;
-        }
-        else {
-            return tiles[x][y];
-        }
+        return tiles[x][y];
     }
 
-
-    /**
-        Sets the tile at the specified location.
-    */
     public void setTile(int x, int y, Image tile) {
         tiles[x][y] = tile;
     }
 
-
     /**
-        Gets the player Sprite.
-    */
+     * Elimina el tile en (x, y) — usado al romper bloques desde abajo.
+     * Equivalente a setTile(x, y, null).
+     */
+    public void breakTile(int x, int y) {
+        if (x >= 0 && x < getWidth() && y >= 0 && y < getHeight()) {
+            tiles[x][y] = null;
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Player
+    // -------------------------------------------------------------------------
+
     public Sprite getPlayer() {
         return player;
     }
 
-
-    /**
-        Sets the player Sprite.
-    */
-    public void setPlayer(Sprite player) {
-        this.player = player;
+    public void setPlayer(Sprite p) {
+        this.player = p;
     }
 
+    // -------------------------------------------------------------------------
+    // Sprites
+    // -------------------------------------------------------------------------
 
-    /**
-        Adds a Sprite object to this map.
-    */
     public void addSprite(Sprite sprite) {
         sprites.add(sprite);
     }
 
-
-    /**
-        Removes a Sprite object from this map.
-    */
     public void removeSprite(Sprite sprite) {
         sprites.remove(sprite);
     }
 
-
-    /**
-        Gets an Iterator of all the Sprites in this map,
-        excluding the player Sprite.
-    */
-    public Iterator getSprites() {
+    /** Returns an iterator over all non-player sprites. */
+    public Iterator<Sprite> getSprites() {
         return sprites.iterator();
     }
-
 }

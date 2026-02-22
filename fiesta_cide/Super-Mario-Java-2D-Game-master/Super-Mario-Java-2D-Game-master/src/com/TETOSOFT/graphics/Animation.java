@@ -2,20 +2,25 @@ package com.TETOSOFT.graphics;
 
 import java.awt.Image;
 import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * A time-based sprite animation made up of a sequence of frames.
+ */
 public class Animation {
 
-    private ArrayList frames;
-    private int currFrameIndex;
+    private final List<AnimFrame> frames;
+    private int  currFrameIndex;
     private long animTime;
     private long totalDuration;
 
     public Animation() {
-        this(new ArrayList(), 0);
+        frames = new ArrayList<>();
     }
 
-    private Animation(ArrayList frames, long totalDuration) {
-        this.frames = frames;
+    /** Private constructor used by {@link #clone()}. */
+    private Animation(List<AnimFrame> frames, long totalDuration) {
+        this.frames        = new ArrayList<>(frames);
         this.totalDuration = totalDuration;
         start();
     }
@@ -30,53 +35,80 @@ public class Animation {
     }
 
     public synchronized void start() {
-        animTime = 0;
+        animTime       = 0;
         currFrameIndex = 0;
     }
 
     public synchronized void update(long elapsedTime) {
-        if (frames.size() > 1) {
-            animTime += elapsedTime;
+        if (frames.size() <= 1) return;
 
-            if (animTime >= totalDuration) {
-                animTime = animTime % totalDuration;
-                currFrameIndex = 0;
-            }
+        animTime += elapsedTime;
 
-            while (animTime > getFrame(currFrameIndex).endTime) {
-                currFrameIndex++;
-            }
+        if (animTime >= totalDuration) {
+            animTime = animTime % totalDuration;
+            currFrameIndex = 0;
+        }
+
+        while (animTime > getFrame(currFrameIndex).endTime) {
+            currFrameIndex++;
+        }
+    }
+
+    /**
+     * Advances the walk cycle using only the first {@code walkFrameCount} frames,
+     * ignoring any trailing idle/jump frames that should never auto-advance.
+     *
+     * @param walkFrameCount number of frames that belong to the walk cycle (e.g. 3)
+     */
+    public synchronized void updateWalkCycle(long elapsedTime) {
+        final int walkFrameCount = 3; // frames 0-2 are the walk cycle
+        if (frames.size() < walkFrameCount) { update(elapsedTime); return; }
+
+        // Keep currFrameIndex inside the walk range before accumulating time
+        if (currFrameIndex >= walkFrameCount) {
+            currFrameIndex = 0;
+            animTime = 0;
+        }
+
+        animTime += elapsedTime;
+
+        long walkDuration = getFrame(walkFrameCount - 1).endTime;
+        if (animTime >= walkDuration) {
+            animTime = animTime % walkDuration;
+            currFrameIndex = 0;
+        }
+
+        while (currFrameIndex < walkFrameCount - 1
+                && animTime > getFrame(currFrameIndex).endTime) {
+            currFrameIndex++;
         }
     }
 
     public synchronized Image getImage() {
-        if (frames.size() == 0) {
-            return null;
-        } else {
-            return getFrame(currFrameIndex).image;
+        if (frames.isEmpty()) return null;
+        return getFrame(currFrameIndex).image;
+    }
+
+    public synchronized void setCurrFrame(int index) {
+        if (index >= 0 && index < frames.size()) {
+            currFrameIndex = index;
+            animTime = (index == 0) ? 0 : getFrame(index - 1).endTime;
         }
     }
 
     private AnimFrame getFrame(int i) {
-        return (AnimFrame) frames.get(i);
+        return frames.get(i);
     }
 
-    private class AnimFrame {
-        Image image;
-        long endTime;
+    // -------------------------------------------------------------------------
 
-        public AnimFrame(Image image, long endTime) {
-            this.image = image;
+    private static class AnimFrame {
+        final Image image;
+        final long  endTime;
+
+        AnimFrame(Image image, long endTime) {
+            this.image   = image;
             this.endTime = endTime;
-        }
-    }
-
-    // Dentro de Animation.java
-    public synchronized void setCurrFrame(int index) {
-        if (index >= 0 && index < frames.size()) {
-            currFrameIndex = index;
-            // Ajustamos el tiempo interno para que no salte al siguiente frame de inmediato
-            animTime = (index == 0) ? 0 : getFrame(index - 1).endTime;
         }
     }
 }
