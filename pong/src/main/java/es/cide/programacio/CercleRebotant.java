@@ -1,162 +1,329 @@
 package es.cide.programacio;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
-// Classe que representa un panell on es dibuixa un cercle que rebota
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.util.Random;
+import javax.imageio.ImageIO;
+
+import java.io.IOException;
+import java.net.URL;
+
 public class CercleRebotant extends JPanel implements ActionListener {
-    private int xPilota = 10, yPilota = 10; // Coordenades inicials del cercle
-    private double dxPilota = 2, dyPilota = 2; // Velocitat del moviment en X i Y
-    private double xRectangle1 = 200, yRectangle1 = 100;
-    private double xRectangleSize1 = 50, yRectangleSize1 = 50;
-    private double xRectangle2 = 150, yRectangle2 = 50;
-    private double xRectangleSize2 = 50, yRectangleSize2 = 50;
-    private double dyRectangle2 = 0.25, dyRectangle1 = 0.25;
-    private final int RADI = 20; // Radi del cercle
-    private final int DELAY = 10; // Retard del temporitzador en mil·lisegons
-    private Timer timer; // Temporitzador per controlar l'animació
 
-    double posXpilota;
-    double posYpilota;
+    // Variables de movimiento y posición
+    private double dxPilota = 6, dyPilota = 6;
+    private double xRectangle11 = 100, yRectangle11 = 100;
+    private double xRectangle12 = 400, yRectangle12 = 100;
+    private double xRectangle21 = 1150, yRectangle21 = 50;
+    private double xRectangle22 = 850, yRectangle22 = 50;
 
-    // Constructor que inicialitza el panell i inicia el temporitzador
-    public CercleRebotant() {
-        setBackground(Color.WHITE); // Defineix el color de fons del panell
-        timer = new Timer(DELAY, this); // Crea el temporitzador amb retard especificat
-        timer.start(); // Inicia el temporitzador
+    private double xRectangleSize = 50, yRectangleSize = 180;
+    private final int RADI = 20;
+    private final int DELAY = 10;
+    private final static int HEIGHT = 1080;
+    private final static int WIDTH = 1920;
+
+    private int xPilota = 500, yPilota = 500;
+    private Timer timer;
+    private Image imagenPelota;
+
+    private int puntuacion1 = 0;
+    private int puntuacion2 = 0;
+    private long ultimoRebote = 0;
+
+    // Variables para mostrar posición del ratón
+    private int mouseX, mouseY;
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Cercle Rebotant");
+            CercleRebotant panel = new CercleRebotant();
+
+            frame.add(panel);
+            frame.setSize(WIDTH, HEIGHT);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+        });
     }
 
-    // Mètode per dibuixar el cercle dins del panell
+    private Image imagenJ1;
+    private Image imagenJ2;
+
+    public CercleRebotant() {
+        // 1. Intentamos cargar la imagen dentro de un bloque try
+        try {
+            URL urlJ1 = getClass().getResource("/a1.png");
+            URL urlJ2 = getClass().getResource("/b1.png");
+
+            if (urlJ1 != null) {
+                imagenJ1 = ImageIO.read(urlJ1);
+                imagenJ2 = ImageIO.read(urlJ2);
+            } else {
+                // Esto te avisará en la consola si la ruta está mal
+                System.err.println("Error: No se encontró el archivo en /res/jugador1.png");
+            }
+
+        } catch (IOException e) {
+            // 2. Aquí capturamos el error si falla la lectura
+            System.err.println("Error al leer la imagen: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        setBackground(Color.GRAY);
+        addKeyboard();
+
+        // Listener del ratón integrado correctamente (java.awt.event.MouseEvent)
+        addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                mouseX = e.getX();
+                mouseY = e.getY();
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                mouseX = e.getX();
+                mouseY = e.getY();
+            }
+        });
+
+        timer = new Timer(DELAY, this);
+        timer.start();
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g; // Conversió a Graphics2D per millorar el dibuix
-        g2d.setColor(Color.RED); // Defineix el color del cercle
-        g2d.fillOval(xPilota, yPilota, RADI * 2, RADI * 2); // Dibuixa el cercle amb les coordenades i el radi
+        Graphics2D g2d = (Graphics2D) g;
 
-        Graphics2D r1 = (Graphics2D) g;
-        r1.setColor(Color.green);
-        r1.fillRect((int) xRectangle1, (int) yRectangle1, (int) xRectangleSize1, (int) yRectangleSize1);
+        // Suavizado de dibujo
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        /*
-         * Graphics2D r2 = (Graphics2D) g;
-         * r2.setColor(Color.blue);
-         */
+        // Dibujar Pelota (Imagen o círculo rojo si falla la carga)
+        if (imagenPelota != null) {
+            g2d.drawImage(imagenPelota, xPilota, yPilota, RADI * 2, RADI * 2, this);
+        } else {
+            g2d.setColor(Color.RED);
+            g2d.fillOval(xPilota, yPilota, RADI * 2, RADI * 2);
+        }
 
-        Graphics2D l1 = (Graphics2D) g;
-        l1.fillRect((int) xRectangle1, (int) (yRectangle1), 1, 1000);
-        l1.setColor(Color.yellow);
+        // Rectángulos grupo 1 (Verdes)
+        g2d.setColor(Color.GREEN);
+        g2d.fillRect((int) xRectangle11, (int) yRectangle11, (int) xRectangleSize, (int) yRectangleSize);
 
-        Graphics2D l2 = (Graphics2D) g;
-        l2.fillRect((int) (xRectangle1 + xRectangleSize1), (int) (yRectangle1), 1, 1000);
-        l2.setColor(Color.yellow);
+        // Dibujamos la imagen ENCIMA. Al usar xRectangleSize e yRectangleSize, se
+        // escala sola.
+        if (imagenJ1 != null) {
+            g2d.drawImage(imagenJ1, (int) xRectangle11, (int) yRectangle11, (int) xRectangleSize, (int) yRectangleSize,
+                    this);
+        }
 
-        Graphics2D l3 = (Graphics2D) g;
-        l3.fillRect((int) xRectangle1, (int) (yRectangle1), 1000, 1);
-        l3.setColor(Color.yellow);
+        // Repetir para los demás...
+        g2d.setColor(Color.decode("#00008b"));
+        g2d.fillRect((int) xRectangle12, (int) yRectangle12, (int) xRectangleSize, (int) yRectangleSize);
+        if (imagenJ2 != null) {
+            g2d.drawImage(imagenJ2, (int) xRectangle12, (int) yRectangle12, (int) xRectangleSize, (int) yRectangleSize,
+                    this);
+        }
 
-        Graphics2D l4 = (Graphics2D) g;
-        l4.fillRect((int) xRectangle1, (int) (yRectangle1 + yRectangleSize1), 1000, 1);
-        l4.setColor(Color.yellow);
+        // --- RECTÁNGULOS GRUPO 2 (Ejemplo: Jugador 2) ---
 
+        g2d.setColor(Color.BLUE);
+        g2d.fillRect((int) xRectangle21, (int) yRectangle21, (int) xRectangleSize,
+                (int) yRectangleSize);
+        if (imagenJ2 != null) {
+            g2d.drawImage(imagenJ2, (int) xRectangle21, (int) yRectangle21, (int) xRectangleSize, (int) yRectangleSize,
+                    this);
+        }
+
+        g2d.setColor(Color.decode("#006400"));
+        g2d.fillRect((int) xRectangle22, (int) yRectangle22, (int) xRectangleSize,
+                (int) yRectangleSize);
+        if (imagenJ1 != null) {
+            g2d.drawImage(imagenJ1, (int) xRectangle22, (int) yRectangle22, (int) xRectangleSize, (int) yRectangleSize,
+                    this);
+        }
+
+        // UI: Puntuación y Coordenadas Ratón
+        g2d.setColor(Color.WHITE);
+        g2d.setFont(new Font("Arial", Font.BOLD, 20));
+        g2d.drawString("Punts J1: " + puntuacion1, 50, 50);
+        g2d.drawString("Punts J2: " + puntuacion2, 50, 80);
+        g2d.drawString("Ratolí: " + mouseX + ", " + mouseY, 50, 110);
     }
 
-    // Mètode que s'executa a cada tic del temporitzador per moure el cercle
     @Override
     public void actionPerformed(ActionEvent e) {
-        posXpilota = xPilota + 2 * RADI;
-        posYpilota = yPilota + 2 * RADI;
-        // Comprova si el cercle toca les vores horitzontals
+        long tiempoActual = System.currentTimeMillis();
+
+        // Rebote bordes horizontales (Puntos)
         if (xPilota + 2 * RADI >= getWidth() || xPilota <= 0) {
-            dxPilota = -dxPilota; // Inverteix la direcció horitzontal
+            if (xPilota <= 0)
+                point(2);
+            else
+                point(1);
         }
-        // Comprova si el cercle toca les vores verticals
+
+        // Rebote bordes verticales
         if (yPilota + 2 * RADI >= getHeight() || yPilota <= 0) {
-            dyPilota = -dyPilota; // Inverteix la direcció vertical
+            dyPilota = -dyPilota;
         }
 
-        // Comprova si el cercle toca les vores horitzontals
-        /*
-         * if (yPilota >= yRectangle1 + yRectangleSize1) {
-         * dyPilota = -dyPilota;
-         * }
-         */
-        /*
-         * if ((xPilota + 2 * RADI >= xRectangle1 - xRectangleSize1)
-         * && (yPilota + 2 * RADI <= yRectangle1 + yRectangleSize1)) {
-         * if ((xPilota + 2 * RADI <= xRectangle1 - xRectangleSize1))
-         */
-        if ((posXpilota >= xRectangle1) && (posXpilota <= xRectangle1 + xRectangleSize1) && (posYpilota > yRectangle1)
-                && (posYpilota < yRectangle1 + yRectangleSize1)) {
-            if ((posYpilota > yRectangle1) || (posYpilota > yRectangle1 + yRectangleSize1)) {
-                dyPilota = -dyPilota;
+        // Lógica de colisiones con rectángulos (con delay de 0.5s)
+        checkCollision(xRectangle11, yRectangle11, tiempoActual, false);
+        checkCollision(xRectangle12, yRectangle12, tiempoActual, false);
+        checkCollision(xRectangle21, yRectangle21, tiempoActual, true); // True porque es el lado derecho
+        checkCollision(xRectangle22, yRectangle22, tiempoActual, true);
+
+        xPilota += dxPilota;
+        yPilota += dyPilota;
+        repaint();
+    }
+
+    private void checkCollision(double rx, double ry, long tiempoActual, boolean isRightSide) {
+        if (tiempoActual - ultimoRebote > 500) {
+            // Detección simple de colisión por área
+            if (xPilota + RADI * 2 >= rx && xPilota <= rx + xRectangleSize &&
+                    yPilota + RADI * 2 >= ry && yPilota <= ry + yRectangleSize) {
+
+                dxPilota *= -1;
+                ultimoRebote = tiempoActual;
             }
-
-            System.out.println("toca");
         }
+    }
 
-        // dxPilota = -dxPilota;
+    // 1. Declaramos un arreglo lo suficientemente grande para los códigos de teclas
+    // 256 suele bastar, pero 1024 cubre prácticamente cualquier teclado especial
+    private final boolean[] keys = new boolean[1024];
 
-        // || (xPilota + 2 * RADI >= xRectangle1 + xRectangleSize1)
-        // }
+    /*
+     * private void addKeyboard() {
+     * 
+     * KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
+     * new KeyEventDispatcher() {
+     * 
+     * @Override
+     * 
+     * public boolean dispatchKeyEvent(KeyEvent e) {
+     * 
+     * if (e.getID() == KeyEvent.KEY_PRESSED) {
+     * 
+     * int c = e.getKeyCode();
+     * 
+     * double vel = 15.0;
+     * 
+     * switch (c) {
+     * 
+     * case KeyEvent.VK_W:
+     * 
+     * yRectangle11 -= vel;
+     * 
+     * yRectangle22 -= vel;
+     * 
+     * break;
+     * 
+     * case KeyEvent.VK_S:
+     * 
+     * yRectangle11 += vel;
+     * 
+     * yRectangle22 += vel;
+     * 
+     * break;
+     * 
+     * case KeyEvent.VK_UP:
+     * 
+     * yRectangle21 -= vel;
+     * 
+     * yRectangle12 -= vel;
+     * 
+     * break;
+     * 
+     * case KeyEvent.VK_DOWN:
+     * 
+     * yRectangle21 += vel;
+     * 
+     * yRectangle12 += vel;
+     * 
+     * break;
+     * 
+     * 
+     * 
+     * }
+     * 
+     * }
+     * 
+     * return false;
+     */
 
-        // dyPilota = -dyPilota;
-
-        // Actualitza la posició del cercle
-
+    private void addKeyboard() {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {
+                int code = e.getKeyCode();
 
-                int c = e.getKeyCode();
-                System.out.println(c);
-
-                switch (c) {
-                    case 87:
-                        yRectangle1 -= dyRectangle1;
-
-                        break;
-                    case 83:
-
-                        yRectangle1 += dyRectangle1;
-
-                        break;
-
-                    case 40:
-
-                        yRectangle2 += dyRectangle2;
-
-                        break;
-                    case 38:
-
-                        yRectangle2 -= dyRectangle2;
-
-                        break;
-                    default:
-                        break;
+                // Validamos que el código esté dentro del rango del arreglo
+                if (code >= 0 && code < keys.length) {
+                    if (e.getID() == KeyEvent.KEY_PRESSED) {
+                        keys[code] = true;
+                    } else if (e.getID() == KeyEvent.KEY_RELEASED) {
+                        keys[code] = false;
+                    }
                 }
                 return false;
-
             }
         });
-        xPilota += dxPilota;
-        yPilota += dyPilota;
-        repaint(); // Redibuixa el panell per actualitzar la posició del cercle
+
+        // Bucle de movimiento (Timer)
+        Timer gameLoop = new Timer(16, e -> updateMovement());
+        gameLoop.start();
     }
 
-    // Mètode principal per iniciar l'aplicació
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Cercle Rebotant"); // Crea la finestra
-            CercleRebotant panel = new CercleRebotant(); // Crea una instància del panell
-            frame.add(panel); // Afegeix el panell a la finestra
-            frame.setSize(400, 300); // Defineix la mida de la finestra
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Configura el tancament de la finestra
-            frame.setLocationRelativeTo(null); // Centra la finestra a la pantalla
-            frame.setVisible(true); // Mostra la finestra
-        });
+    private void updateMovement() {
+        double vel = 15.0;
+
+        // Jugador 1 (WASD)
+        if (keys[KeyEvent.VK_W]) {
+            yRectangle11 -= vel;
+            yRectangle22 -= vel;
+        }
+        if (keys[KeyEvent.VK_S]) {
+            yRectangle11 += vel;
+            yRectangle22 += vel;
+        }
+
+        // Jugador 2 (Flechas)
+        if (keys[KeyEvent.VK_UP]) {
+            yRectangle21 -= vel;
+            yRectangle12 -= vel;
+        }
+        if (keys[KeyEvent.VK_DOWN]) {
+            yRectangle21 += vel;
+            yRectangle12 += vel;
+        }
+
+        repaint();
+    }
+
+    private void point(int player) {
+        if (player == 1)
+            puntuacion1++;
+        else
+            puntuacion2++;
+
+        // Reset posición
+        xPilota = getWidth() / 2;
+        yPilota = getHeight() / 2;
+
+        // Dirección aleatoria al sacar
+        dxPilota = (new Random().nextBoolean() ? 6 : -6);
+        dyPilota = (new Random().nextBoolean() ? 6 : -6);
     }
 }
