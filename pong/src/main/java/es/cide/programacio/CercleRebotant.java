@@ -104,6 +104,8 @@ public class CercleRebotant extends JPanel implements ActionListener {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
 
+        dibujarCampo(g2d);
+
         // Suavizado de dibujo
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -158,6 +160,45 @@ public class CercleRebotant extends JPanel implements ActionListener {
         g2d.drawString("Punts J1: " + puntuacion1, 50, 50);
         g2d.drawString("Punts J2: " + puntuacion2, 50, 80);
         g2d.drawString("Ratolí: " + mouseX + ", " + mouseY, 50, 110);
+
+    }
+
+    private void dibujarCampo(Graphics2D g2d) {
+        // 1. Fondo del césped
+        g2d.setColor(new Color(34, 139, 34)); // Verde bosque
+        g2d.fillRect(0, 0, getWidth(), getHeight());
+
+        // 2. Configurar el color y grosor de las líneas
+        g2d.setColor(Color.WHITE);
+        g2d.setStroke(new BasicStroke(3)); // Líneas un poco más gruesas
+
+        // --- Líneas Perimetrales ---
+        // Dejamos un pequeño margen de 20px para que no peguen al borde
+        int margen = 20;
+        int campoW = getWidth() - (margen * 2);
+        int campoH = getHeight() - (margen * 2);
+        g2d.drawRect(margen, margen, campoW, campoH);
+
+        // --- Línea de Medio Campo ---
+        int mitadX = getWidth() / 2;
+        g2d.drawLine(mitadX, margen, mitadX, getHeight() - margen);
+
+        // --- Círculo Central ---
+        int radioCirculo = 100;
+        g2d.drawOval(mitadX - radioCirculo, (getHeight() / 2) - radioCirculo, radioCirculo * 2, radioCirculo * 2);
+
+        // Punto central (opcional)
+        g2d.fillOval(mitadX - 5, (getHeight() / 2) - 5, 10, 10);
+
+        // --- Áreas de Portería (Opcional pero recomendado) ---
+        int anchoArea = 150;
+        int altoArea = 400;
+
+        // Área Izquierda
+        g2d.drawRect(margen, (getHeight() / 2) - (altoArea / 2), anchoArea, altoArea);
+
+        // Área Derecha
+        g2d.drawRect(getWidth() - margen - anchoArea, (getHeight() / 2) - (altoArea / 2), anchoArea, altoArea);
     }
 
     @Override
