@@ -16,21 +16,27 @@ import java.net.URL;
 
 public class Pong extends JPanel implements ActionListener {
 
+    // ----- REVISAR ------
+    private final static int HEIGHT = 1080;
+    private final static int WIDTH = 1920;
+
     // 1. Declaramos un arreglo lo suficientemente grande para los códigos de teclas
     // 256 suele bastar, pero 1024 cubre prácticamente cualquier teclado especial
     private final boolean[] keys = new boolean[1024];
     // Variables de movimiento y posición
-    private double dxPilota = 6, dyPilota = 6;
-    private final int RADI = 20;
-    private int xPilota = 500, yPilota = 500;
 
-    // posicion rectangulos
-    private double xRectangle11 = 100, yRectangle11 = 100;
-    private double xRectangle12 = 400, yRectangle12 = 100;
-    private double xRectangle21 = 1150, yRectangle21 = 50;
-    private double xRectangle22 = 850, yRectangle22 = 50;
-    private double xRectangleSize = 50, yRectangleSize = 180;
-    private double rectangleVel = 15.0;
+    private final int RADI = 20;
+
+    private static final double DXPILOTAINI = 6, DYPILOTAINI = 6;
+    private static final int XPILOTAINI = 500, YPILOTAINI = 500;
+
+    private static final double XRECTANGLESIZE = 50, YRECTANGLESIZE = 180;
+    private static final double XRECTANGLE11 = 200, YRECTANGLE11 = 100;
+    private static final double XRECTANGLE22 = 700, YRECTANGLE12 = 100;
+    private static final double XRECTANGLE21 = WIDTH - (XRECTANGLE11 + XRECTANGLESIZE), YRECTANGLE21 = 100;
+    private static final double XRECTANGLE12 = WIDTH - (XRECTANGLE22 + XRECTANGLESIZE), YRECTANGLE22 = 100;
+
+    private static final double RECTANGLEVEL = 15.0;
 
     private Image imagenJ1;
     private Image imagenJ2;
@@ -42,21 +48,19 @@ public class Pong extends JPanel implements ActionListener {
 
     private int puntuacion1 = 0;
     private int puntuacion2 = 0;
-    private long ultimoRebote = 0;
 
     // Variables para mostrar posición del ratón
     private int mouseX, mouseY;
 
-    Rectangle r1 = new Rectangle(xRectangle11, yRectangle11, xRectangleSize, yRectangleSize, rectangleVel,
-            rectangleVel);
-    Rectangle r2 = new Rectangle(xRectangle12, yRectangle12, xRectangleSize, yRectangleSize, rectangleVel,
-            rectangleVel);
-    Rectangle r3 = new Rectangle(xRectangle22, yRectangle22, xRectangleSize, yRectangleSize, rectangleVel,
-            rectangleVel);
-    Rectangle r4 = new Rectangle(xRectangle21, yRectangle21, xRectangleSize, yRectangleSize, rectangleVel,
-            rectangleVel);
-
-    Cercle c1 = new Cercle(xPilota, yPilota, dxPilota, dyPilota, RADI);
+    Rectangle r1 = new Rectangle(XRECTANGLE11, YRECTANGLE11, XRECTANGLESIZE, YRECTANGLESIZE, RECTANGLEVEL,
+            RECTANGLEVEL);
+    Rectangle r2 = new Rectangle(XRECTANGLE12, YRECTANGLE12, XRECTANGLESIZE, YRECTANGLESIZE, RECTANGLEVEL,
+            RECTANGLEVEL);
+    Rectangle r3 = new Rectangle(XRECTANGLE22, YRECTANGLE22, XRECTANGLESIZE, YRECTANGLESIZE, RECTANGLEVEL,
+            RECTANGLEVEL);
+    Rectangle r4 = new Rectangle(XRECTANGLE21, YRECTANGLE21, XRECTANGLESIZE, YRECTANGLESIZE, RECTANGLEVEL,
+            RECTANGLEVEL);
+    Cercle c1 = new Cercle(XPILOTAINI, YPILOTAINI, DXPILOTAINI, DYPILOTAINI, RADI);
 
     public Pong() {
         // 1. Intentamos cargar la imagen dentro de un bloque try
@@ -101,6 +105,68 @@ public class Pong extends JPanel implements ActionListener {
     }
 
     @Override
+    public void actionPerformed(ActionEvent e) {
+
+        // Rebote bordes horizontales (Puntos)
+        if (c1.getPosX() + 2 * RADI >= getWidth() || c1.getPosX() <= 0) {
+            if (c1.getPosX() <= 0)
+                point(2);
+            else
+                point(1);
+        }
+
+        // Rebote bordes verticales
+        if (c1.getPosY() + 2 * RADI >= getHeight() || c1.getPosY() <= 0) {
+            c1.setYvel(-c1.getVelY());
+        }
+
+        if (CollisionDetector.collides(r1, c1))
+            handleCollision(r1);
+        if (CollisionDetector.collides(r2, c1))
+            handleCollision(r2);
+        if (CollisionDetector.collides(r3, c1))
+            handleCollision(r3);
+        if (CollisionDetector.collides(r4, c1))
+            handleCollision(r4);
+
+        // Mover la pelota
+        c1.setXpos(c1.getPosX() + c1.getVelX());
+        c1.setYpos(c1.getPosY() + c1.getVelY());
+
+        repaint();
+    }
+
+    private long ultimoRebote = 0;
+    private static final long DELAY_REBOTE = 300; // milisegundos
+
+    private void handleCollision(Rectangle r) {
+        long ahora = System.currentTimeMillis();
+        if (ahora - ultimoRebote < DELAY_REBOTE)
+            return;
+
+        ultimoRebote = ahora;
+
+        double circleCenterX = c1.getPosX() + c1.radi;
+        double circleCenterY = c1.getPosY() + c1.radi;
+
+        double rectCenterX = r.getPosX() + r.getSizeX() / 2;
+        double rectCenterY = r.getPosY() + r.getSizeY() / 2;
+
+        double dx = circleCenterX - rectCenterX;
+        double dy = circleCenterY - rectCenterY;
+
+        if (Math.abs(dx) > Math.abs(dy)) {
+            c1.setXvel(-c1.getVelX());
+        } else {
+            c1.setYvel(-c1.getVelY());
+        }
+    }
+
+    private void dxBounce() {
+        c1.setXvel(-c1.getVelX());
+    }
+
+    @Override
     protected void paintComponent(Graphics g) {
 
         super.paintComponent(g);
@@ -135,113 +201,37 @@ public class Pong extends JPanel implements ActionListener {
     }
 
     private void drawCercle(Graphics2D g2d) {
-
-        if (imagenPelota != null) {
-            g2d.drawImage(imagenPelota, xPilota, yPilota, RADI * 2, RADI * 2, this);
-        } else {
-            g2d.setColor(Color.RED);
-            g2d.fillOval(xPilota, yPilota, RADI * 2, RADI * 2);
-        }
+        g2d.setColor(Color.RED);
+        g2d.fillOval((int) c1.getPosX(), (int) c1.getPosY(), RADI * 2, RADI * 2);
     }
 
     private void drawCampo(Graphics2D g2d) {
         // 1. Fondo del césped
         g2d.setColor(new Color(34, 139, 34)); // Verde bosque
         g2d.fillRect(0, 0, getWidth(), getHeight());
-
         // 2. Configurar el color y grosor de las líneas
         g2d.setColor(Color.WHITE);
         g2d.setStroke(new BasicStroke(3)); // Líneas un poco más gruesas
-
         // --- Líneas Perimetrales ---
         int margen = 20;
         int campoW = getWidth() - (margen * 2);
         int campoH = getHeight() - (margen * 2);
         g2d.drawRect(margen, margen, campoW, campoH);
-
         // --- Línea de Medio Campo ---
         int mitadX = getWidth() / 2;
         g2d.drawLine(mitadX, margen, mitadX, getHeight() - margen);
-
         // --- Círculo Central ---
         int radioCirculo = 100;
         g2d.drawOval(mitadX - radioCirculo, (getHeight() / 2) - radioCirculo, radioCirculo * 2, radioCirculo * 2);
-
         // Punto central
         g2d.fillOval(mitadX - 5, (getHeight() / 2) - 5, 10, 10);
-
         // --- Áreas de Portería---
         int anchoArea = 150;
         int altoArea = 400;
-
         // Área Izquierda
         g2d.drawRect(margen, (getHeight() / 2) - (altoArea / 2), anchoArea, altoArea);
-
         // Área Derecha
         g2d.drawRect(getWidth() - margen - anchoArea, (getHeight() / 2) - (altoArea / 2), anchoArea, altoArea);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        long tiempoActual = System.currentTimeMillis();
-
-        // Rebote bordes horizontales (Puntos)
-        if (xPilota + 2 * RADI >= getWidth() || xPilota <= 0) {
-            if (xPilota <= 0)
-                point(2);
-            else
-                point(1);
-        }
-
-        // Rebote bordes verticales
-        if (yPilota + 2 * RADI >= getHeight() || yPilota <= 0) {
-            dyPilota = -dyPilota;
-        }
-
-        // Lógica de colisiones con rectángulos (con delay de 0.5s)
-        checkCollision(xRectangle11, yRectangle11, tiempoActual, false);
-        checkCollision(xRectangle12, yRectangle12, tiempoActual, false);
-        checkCollision(xRectangle21, yRectangle21, tiempoActual, true); // True porque es el lado derecho
-        checkCollision(xRectangle22, yRectangle22, tiempoActual, true);
-
-        xPilota += dxPilota;
-        yPilota += dyPilota;
-        repaint();
-    }
-
-    private void checkCollision(double rx, double ry, long tiempoActual, boolean isRightSide) {
-        if (tiempoActual - ultimoRebote > 500) {
-            // Detección simple de colisión por área
-            if (xPilota + RADI * 2 >= rx && xPilota <= rx + xRectangleSize &&
-                    yPilota + RADI * 2 >= ry && yPilota <= ry + yRectangleSize) {
-
-                dxPilota *= -1;
-                ultimoRebote = tiempoActual;
-            }
-        }
-    }
-
-    private void addKeyboard() {
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
-            @Override
-            public boolean dispatchKeyEvent(KeyEvent e) {
-                int code = e.getKeyCode();
-
-                // Validamos que el código esté dentro del rango del arreglo
-                if (code >= 0 && code < keys.length) {
-                    if (e.getID() == KeyEvent.KEY_PRESSED) {
-                        keys[code] = true;
-                    } else if (e.getID() == KeyEvent.KEY_RELEASED) {
-                        keys[code] = false;
-                    }
-                }
-                return false;
-            }
-        });
-
-        // Bucle de movimiento (Timer)
-        Timer gameLoop = new Timer(16, e -> updateMovement());
-        gameLoop.start();
     }
 
     private void updateMovement() {
@@ -277,12 +267,31 @@ public class Pong extends JPanel implements ActionListener {
     }
 
     private void resetCerclePos() {
-        // Reset posición
-        xPilota = getWidth() / 2;
-        yPilota = getHeight() / 2;
+        c1.setPos(getWidth() / 2, getHeight() / 2);
+        c1.setXvel(new Random().nextBoolean() ? 6.0 : -6.0);
+        c1.setYvel(new Random().nextBoolean() ? 6.0 : -6.0);
+    }
 
-        // Dirección aleatoria al sacar
-        dxPilota = (new Random().nextBoolean() ? 6 : -6);
-        dyPilota = (new Random().nextBoolean() ? 6 : -6);
+    private void addKeyboard() {
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent e) {
+                int code = e.getKeyCode();
+
+                // Validamos que el código esté dentro del rango del arreglo
+                if (code >= 0 && code < keys.length) {
+                    if (e.getID() == KeyEvent.KEY_PRESSED) {
+                        keys[code] = true;
+                    } else if (e.getID() == KeyEvent.KEY_RELEASED) {
+                        keys[code] = false;
+                    }
+                }
+                return false;
+            }
+        });
+
+        // Bucle de movimiento (Timer)
+        Timer gameLoop = new Timer(16, e -> updateMovement());
+        gameLoop.start();
     }
 }

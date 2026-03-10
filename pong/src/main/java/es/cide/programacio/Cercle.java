@@ -1,12 +1,17 @@
 package es.cide.programacio;
 
-public class Cercle {
+public class Cercle implements Collider {
 
     double xPos;
     double yPos;
     double xVel;
     double yVel;
     double radi;
+
+    @Override
+    public String getShapeType() {
+        return "cercle";
+    }
 
     public Cercle() {
 
@@ -25,7 +30,7 @@ public class Cercle {
     }
 
     public void setYpos(double newYpos) {
-        this.xPos = newYpos;
+        this.yPos = newYpos;
     }
 
     public void setPos(double newXpos, double newYpos) {
@@ -43,6 +48,35 @@ public class Cercle {
 
     public void setYvel(double newYvel) {
         this.yVel = newYvel;
+    }
+
+    public void setPosX(double newX) {
+        this.xPos = newX;
+    }
+
+    public void setPosY(double newY) {
+        this.yPos = newY;
+    }
+
+    public void setVel(double newXvel, double newYvel) {
+        setXvel(newXvel);
+        setYvel(newYvel);
+    }
+
+    public double getPosX() {
+        return this.xPos;
+    }
+
+    public double getPosY() {
+        return this.yPos;
+    }
+
+    public double getVelX() {
+        return this.xVel;
+    }
+
+    public double getVelY() {
+        return this.yVel;
     }
 
 }

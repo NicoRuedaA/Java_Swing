@@ -1,6 +1,6 @@
 package es.cide.programacio;
 
-public class Rectangle {
+public class Rectangle implements Collider {
 
     // crear velocidad por defecto
     // poner velocidad por defecto en el constructor sin velocidad
@@ -10,6 +10,11 @@ public class Rectangle {
     double ySize;
     double xVel;
     double yVel;
+
+    @Override
+    public String getShapeType() {
+        return "rectangle";
+    }
 
     public Rectangle() {
 
@@ -60,27 +65,27 @@ public class Rectangle {
         setYvel(newYvel);
     }
 
-    double getPosX() {
+    public double getPosX() {
         return this.xPos;
     }
 
-    double getPosY() {
+    public double getPosY() {
         return this.yPos;
     }
 
-    double getSizeX() {
+    public double getSizeX() {
         return this.xSize;
     }
 
-    double getSizeY() {
+    public double getSizeY() {
         return this.ySize;
     }
 
-    double getVelX() {
+    public double getVelX() {
         return this.xVel;
     }
 
-    double getVelY() {
+    public double getVelY() {
         return this.yVel;
     }
 
