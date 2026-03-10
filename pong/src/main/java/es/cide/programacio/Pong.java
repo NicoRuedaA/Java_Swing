@@ -52,6 +52,14 @@ public class Pong extends JPanel implements ActionListener {
     // Variables para mostrar posición del ratón
     private int mouseX, mouseY;
 
+    // --- PAUSA ---
+    private boolean pausado = false;
+    private java.awt.Rectangle botonMenuBounds = null;
+
+    // --- NAVEGACIÓN ---
+    private final CardLayout cardLayout;
+    private final JPanel contenedor;
+
     Rectangle r1 = new Rectangle(XRECTANGLE11, YRECTANGLE11, XRECTANGLESIZE, YRECTANGLESIZE, RECTANGLEVEL,
             RECTANGLEVEL);
     Rectangle r2 = new Rectangle(XRECTANGLE12, YRECTANGLE12, XRECTANGLESIZE, YRECTANGLESIZE, RECTANGLEVEL,
@@ -62,7 +70,10 @@ public class Pong extends JPanel implements ActionListener {
             RECTANGLEVEL);
     Cercle c1 = new Cercle(XPILOTAINI, YPILOTAINI, DXPILOTAINI, DYPILOTAINI, RADI);
 
-    public Pong() {
+    public Pong(CardLayout cardLayout, JPanel contenedor) {
+        this.cardLayout = cardLayout;
+        this.contenedor = contenedor;
+
         // 1. Intentamos cargar la imagen dentro de un bloque try
         try {
             URL urlJ1 = getClass().getResource("/a1.png");
@@ -101,6 +112,21 @@ public class Pong extends JPanel implements ActionListener {
         });
 
         timer = new Timer(DELAY, this);
+    }
+
+    public void iniciar() {
+        pausado = false;
+        timer.start();
+    }
+
+    public void pausar() {
+        pausado = true;
+        timer.stop();
+        repaint();
+    }
+
+    public void reanudar() {
+        pausado = false;
         timer.start();
     }
 
@@ -140,14 +166,8 @@ public class Pong extends JPanel implements ActionListener {
     private static final long DELAY_REBOTE = 300; // milisegundos
 
     private void handleCollision(Rectangle r) {
-        long ahora = System.currentTimeMillis();
-        if (ahora - ultimoRebote < DELAY_REBOTE)
-            return;
-
-        ultimoRebote = ahora;
-
-        double circleCenterX = c1.getPosX() + c1.radi;
-        double circleCenterY = c1.getPosY() + c1.radi;
+        double circleCenterX = c1.getPosX() + c1.getRadi();
+        double circleCenterY = c1.getPosY() + c1.getRadi();
 
         double rectCenterX = r.getPosX() + r.getSizeX() / 2;
         double rectCenterY = r.getPosY() + r.getSizeY() / 2;
@@ -155,15 +175,22 @@ public class Pong extends JPanel implements ActionListener {
         double dx = circleCenterX - rectCenterX;
         double dy = circleCenterY - rectCenterY;
 
+        // El eje con mayor distancia al centro indica el lado de entrada
         if (Math.abs(dx) > Math.abs(dy)) {
+            // Golpe lateral
             c1.setXvel(-c1.getVelX());
+            c1.setXpos(dx > 0
+                    ? r.getPosX() + r.getSizeX() // salir por la derecha
+                    : r.getPosX() - c1.getRadi() * 2); // salir por la izquierda
         } else {
+            // Golpe arriba/abajo
             c1.setYvel(-c1.getVelY());
+            c1.setYpos(dy > 0
+                    ? r.getPosY() + r.getSizeY() // salir por abajo
+                    : r.getPosY() - c1.getRadi() * 2); // salir por arriba
         }
-    }
 
-    private void dxBounce() {
-        c1.setXvel(-c1.getVelX());
+        c1.accelerate();
     }
 
     @Override
@@ -184,10 +211,44 @@ public class Pong extends JPanel implements ActionListener {
         // ----- CONTADOR -----
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("Arial", Font.BOLD, 20));
-        g2d.drawString("Punts J1: " + puntuacion1, 50, 50);
-        g2d.drawString("Punts J2: " + puntuacion2, 50, 80);
+        g2d.drawString("Punts J1: " + puntuacion1, WIDTH / 4, 50);
+        g2d.drawString("Punts J2: " + puntuacion2, WIDTH - WIDTH / 4, 50);
         g2d.drawString("Ratolí: " + mouseX + ", " + mouseY, 50, 110);
 
+        // Overlay de pausa
+        if (pausado) {
+            drawPausa(g2d);
+        }
+    }
+
+    private void drawPausa(Graphics2D g2d) {
+        // Fondo semitransparente encima del juego
+        g2d.setColor(new Color(0, 0, 0, 150));
+        g2d.fillRect(0, 0, getWidth(), getHeight());
+
+        // Texto PAUSA centrado
+        g2d.setColor(Color.WHITE);
+        g2d.setFont(new Font("Arial", Font.BOLD, 80));
+        FontMetrics fm = g2d.getFontMetrics();
+        String texto = "PAUSA";
+        int x = (getWidth() - fm.stringWidth(texto)) / 2;
+        int y = getHeight() / 2 - 60;
+        g2d.drawString(texto, x, y);
+
+        // Botón "Volver al menú"
+        int btnW = 300, btnH = 60;
+        int btnX = (getWidth() - btnW) / 2;
+        int btnY = getHeight() / 2 + 20;
+
+        g2d.setColor(new Color(50, 50, 100));
+        g2d.fillRoundRect(btnX, btnY, btnW, btnH, 15, 15);
+        g2d.setColor(Color.WHITE);
+        g2d.setFont(new Font("Arial", Font.BOLD, 24));
+        fm = g2d.getFontMetrics();
+        String btnTexto = "Volver al menú";
+        g2d.drawString(btnTexto, btnX + (btnW - fm.stringWidth(btnTexto)) / 2, btnY + 40);
+
+        botonMenuBounds = new java.awt.Rectangle(btnX, btnY, btnW, btnH);
     }
 
     private void drawRectangle(Graphics2D g2d, Rectangle r, Image img) {
@@ -235,6 +296,8 @@ public class Pong extends JPanel implements ActionListener {
     }
 
     private void updateMovement() {
+        if (pausado)
+            return;
 
         if (keys[KeyEvent.VK_W]) {
             r1.setPosY(r1.getPosY() - r1.getVelY());
@@ -263,7 +326,7 @@ public class Pong extends JPanel implements ActionListener {
             puntuacion2++;
 
         resetCerclePos();
-
+        c1.slowDown();
     }
 
     private void resetCerclePos() {
@@ -282,11 +345,30 @@ public class Pong extends JPanel implements ActionListener {
                 if (code >= 0 && code < keys.length) {
                     if (e.getID() == KeyEvent.KEY_PRESSED) {
                         keys[code] = true;
+
+                        // ESC pausa/reanuda
+                        if (code == KeyEvent.VK_ESCAPE) {
+                            if (pausado)
+                                reanudar();
+                            else
+                                pausar();
+                        }
                     } else if (e.getID() == KeyEvent.KEY_RELEASED) {
                         keys[code] = false;
                     }
                 }
                 return false;
+            }
+        });
+
+        // Click en botón "Volver al menú" durante pausa
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (pausado && botonMenuBounds != null && botonMenuBounds.contains(e.getPoint())) {
+                    timer.stop();
+                    cardLayout.show(contenedor, "menu");
+                }
             }
         });
 

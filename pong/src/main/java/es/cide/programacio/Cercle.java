@@ -1,12 +1,18 @@
 package es.cide.programacio;
 
 public class Cercle implements Collider {
+    private static final double ACEL = 1.05;
 
-    double xPos;
-    double yPos;
-    double xVel;
-    double yVel;
-    double radi;
+    private double initialXvel;
+    private double initialYvel;
+
+    private double xPos;
+    private double yPos;
+    private double xVel;
+
+    private double yVel;
+
+    private double radi;
 
     @Override
     public String getShapeType() {
@@ -23,6 +29,19 @@ public class Cercle implements Collider {
         this.yPos = initialYPos;
         this.xVel = initialXvel;
         this.yVel = initialYvel;
+
+        this.initialXvel = xVel;
+        this.initialYvel = yVel;
+    }
+
+    public void accelerate() {
+        setXvel(getVelX() * ACEL);
+        setYvel(yVel * ACEL);
+    }
+
+    public void slowDown() {
+        setVel(initialXvel, initialYvel);
+
     }
 
     public void setXpos(double newXpos) {
@@ -63,6 +82,10 @@ public class Cercle implements Collider {
         setYvel(newYvel);
     }
 
+    public double getRadi() {
+        return this.radi;
+    }
+
     public double getPosX() {
         return this.xPos;
     }
@@ -79,4 +102,7 @@ public class Cercle implements Collider {
         return this.yVel;
     }
 
+    public double getAcel() {
+        return this.ACEL;
+    }
 }

@@ -35,21 +35,21 @@ public class CollisionDetector {
         double dx = c1.getPosX() - c2.getPosX();
         double dy = c1.getPosY() - c2.getPosY();
         double distancia = Math.sqrt(dx * dx + dy * dy);
-        return distancia < (c1.radi + c2.radi);
+        return distancia < (c1.getRadi() + c2.getRadi());
     }
 
     // ── Rectángulo vs Círculo ─────────────────────────────────────────
     private static boolean rectCircle(Rectangle r, Cercle c) {
         // ✅ Centro del círculo, no esquina
-        double circleCenterX = c.getPosX() + c.radi;
-        double circleCenterY = c.getPosY() + c.radi;
+        double circleCenterX = c.getPosX() + c.getRadi();
+        double circleCenterY = c.getPosY() + c.getRadi();
 
         double nearestX = Math.max(r.getPosX(), Math.min(circleCenterX, r.getPosX() + r.getSizeX()));
         double nearestY = Math.max(r.getPosY(), Math.min(circleCenterY, r.getPosY() + r.getSizeY()));
 
         double dx = circleCenterX - nearestX;
         double dy = circleCenterY - nearestY;
-        return Math.sqrt(dx * dx + dy * dy) < c.radi;
+        return Math.sqrt(dx * dx + dy * dy) < c.getRadi();
     }
 
 }
